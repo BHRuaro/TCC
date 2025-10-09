@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tcc
+    username: postgres
+    password: "admin"
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  jwt:
+    secret: "*2N^=Pt4qcbjGWz2ewF8Cm8CSs8ndT=N"
+    expiration: 3600000 # 1 hora em milissegundos
