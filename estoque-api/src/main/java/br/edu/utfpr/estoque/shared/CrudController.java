@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-public abstract class CrudController<T extends Identifiable<ID>, DTO, ID> {
+public abstract class CrudController<T extends Identifiable<ID>, DTO extends Identifiable<ID>, ID> {
 
     protected final CrudService<T, DTO, ID> service;
 
@@ -35,8 +35,7 @@ public abstract class CrudController<T extends Identifiable<ID>, DTO, ID> {
         if (!service.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
-        // você pode reaproveitar o save, ou implementar um update específico no CrudService
-        DTO updated = service.save(dto);
+        DTO updated = service.update(id, dto);
         return ResponseEntity.ok(updated);
     }
 

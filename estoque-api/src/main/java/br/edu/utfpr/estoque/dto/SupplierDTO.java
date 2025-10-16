@@ -15,5 +15,5 @@ public class SupplierDTO implements Identifiable<Long> {
     private Long id;
     private String name;
     private String cnpj;
-    private UserDTO userDTO;
+    private Long userId;
 }
