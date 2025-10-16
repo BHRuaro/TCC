@@ -1,5 +1,6 @@
 package br.edu.utfpr.estoque.controller;
 
+import br.edu.utfpr.estoque.dto.UserDTO;
 import br.edu.utfpr.estoque.model.User;
 import br.edu.utfpr.estoque.repository.UserRepository;
 import br.edu.utfpr.estoque.security.JwtService;
@@ -42,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<UserDTO> register(@RequestBody RegisterRequest request) {
         User user = User.builder()
                 .name(request.getName())
                 .username(request.getUsername())
@@ -51,6 +52,16 @@ public class AuthController {
                 .active(true)
                 .build();
 
-        return ResponseEntity.ok(userRepository.save(user));
+        User savedUser = userRepository.save(user);
+
+        UserDTO userDTO = new UserDTO(
+                savedUser.getId(),
+                savedUser.getName(),
+                savedUser.getUsername(),
+                savedUser.getRole(),
+                savedUser.getActive()
+        );
+
+        return ResponseEntity.ok(userDTO);
     }
 }
