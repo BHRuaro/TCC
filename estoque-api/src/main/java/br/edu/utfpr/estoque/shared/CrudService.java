@@ -31,11 +31,18 @@ public abstract class CrudService<T extends Identifiable<ID>, DTO extends Identi
         return repository.findById(id)
                 .map(entity -> dtoMapper.toDto(entity, dtoClass));
     }
+    public Optional<T> findByIdEntity(ID id) {
+        return repository.findById(id);
+    }
 
     public DTO save(DTO dto) {
         T entity = dtoMapper.toEntity(dto, entityClass);
         T saved = repository.save(entity);
         return dtoMapper.toDto(saved, dtoClass);
+    }
+
+    public T saveEntity(T entity) {
+        return repository.save(entity);
     }
 
     public DTO update(ID id, DTO dto) {

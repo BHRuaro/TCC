@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/people")
+@RequestMapping("/person")
 public class PersonController extends CrudController<Person, PersonDTO, Long> {
 
     @Autowired

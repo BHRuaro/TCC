@@ -14,6 +14,7 @@ public class PersonDTO implements Identifiable<Long> {
 
     private Long id;
     private String name;
+    private String cpf;
     private String email;
-    private UserDTO user;
+    private Long userId;
 }

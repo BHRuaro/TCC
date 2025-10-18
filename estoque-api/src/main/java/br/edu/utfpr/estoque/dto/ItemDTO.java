@@ -18,8 +18,9 @@ public class ItemDTO implements Identifiable<Long> {
     private String description;
     private Double unitPrice;
     private Integer stockQuantity;
+    private Integer minStockQuantity;
     private String expirationDate;
     private Integer movementLimit;
     private CategoryDTO category;
-    private UserDTO user;
+    private Long userId;
 }
