@@ -1,10 +1,14 @@
 package br.edu.utfpr.estoque.dto;
 
 import br.edu.utfpr.estoque.shared.Identifiable;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -13,14 +17,15 @@ import lombok.Setter;
 public class ItemDTO implements Identifiable<Long> {
 
     private Long id;
-    private SupplierDTO supplier;
     private String name;
     private String description;
-    private Double unitPrice;
+    private BigDecimal unitPrice;
     private Integer stockQuantity;
     private Integer minStockQuantity;
-    private String expirationDate;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDate expirationDate;
     private Integer movementLimit;
-    private CategoryDTO category;
+    private Long categoryId;
+    private Long supplierId;
     private Long userId;
 }

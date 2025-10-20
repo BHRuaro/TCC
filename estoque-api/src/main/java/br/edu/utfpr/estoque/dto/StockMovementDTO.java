@@ -1,5 +1,6 @@
 package br.edu.utfpr.estoque.dto;
 
+import br.edu.utfpr.estoque.model.enums.MovementType;
 import br.edu.utfpr.estoque.shared.Identifiable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,5 +20,8 @@ public class StockMovementDTO implements Identifiable<Long> {
         private Long userId;
         private Long personId;
         private LocalDateTime dateTime;
+        private MovementType type;
+        private Long supplierId;
+        private String observation;
         private List<ItemMovementDTO> itemMovements;
     }

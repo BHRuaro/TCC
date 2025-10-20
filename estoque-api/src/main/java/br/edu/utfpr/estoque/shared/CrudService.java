@@ -1,6 +1,7 @@
 package br.edu.utfpr.estoque.shared;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.Getter;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Optional;
 public abstract class CrudService<T extends Identifiable<ID>, DTO extends Identifiable<ID>, ID> {
 
     protected final JpaRepository<T, ID> repository;
+    @Getter
     protected final DtoMapper dtoMapper;
     private final Class<T> entityClass;
     private final Class<DTO> dtoClass;
@@ -63,4 +65,6 @@ public abstract class CrudService<T extends Identifiable<ID>, DTO extends Identi
     public boolean existsById(ID id) {
         return repository.existsById(id);
     }
+
+
 }

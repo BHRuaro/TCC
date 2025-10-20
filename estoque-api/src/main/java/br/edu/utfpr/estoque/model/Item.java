@@ -1,8 +1,11 @@
 package br.edu.utfpr.estoque.model;
 
 import br.edu.utfpr.estoque.shared.Identifiable;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -29,10 +32,14 @@ public class Item implements Identifiable<Long> {
     @Column(columnDefinition = "text")
     private String description;
 
-    private Float unitPrice;
+    @Column(name = "unit_price", precision = 10, scale = 2)
+    private BigDecimal unitPrice;
 
     private Integer stockQuantity;
 
+    private Integer minStockQuantity;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate expirationDate;
 
     private Integer movementLimit;

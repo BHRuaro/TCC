@@ -1,5 +1,6 @@
 package br.edu.utfpr.estoque.model;
 
+import br.edu.utfpr.estoque.model.enums.MovementType;
 import br.edu.utfpr.estoque.shared.Identifiable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,14 +26,25 @@ public class StockMovement implements Identifiable<Long> {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "person_id", nullable = false)
+    @JoinColumn(name = "person_id")
     private Person person;
 
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
+
+    @Column(name = "observation")
+    private String observation;
+
     @OneToMany(mappedBy = "movement", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemMovement> itemMovements;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private MovementType type;
 
     @Override
     public Long getId() {
