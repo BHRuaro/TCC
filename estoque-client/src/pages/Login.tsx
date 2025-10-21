@@ -37,11 +37,15 @@ export default function Login() {
         setLoading(true)
         try {
             const data = await login(username, password)
+
             localStorage.setItem("token", data.token)
+            localStorage.setItem("role", data.role)
+            localStorage.setItem("name", data.name)
+
             toast({ title: "Login realizado com sucesso!", status: "success" })
             setTimeout(() => navigate("/"), 800)
         } catch (err: any) {
-            localStorage.removeItem("token")
+            localStorage.clear()
             toast({
                 title: "Erro no login",
                 description: err.message || "Não foi possível autenticar",
@@ -53,6 +57,7 @@ export default function Login() {
             setLoading(false)
         }
     }
+
 
     return (
         <Flex minH="100vh" align="center" justify="center" bg="gray.50" px={4}>

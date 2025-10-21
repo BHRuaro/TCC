@@ -3,7 +3,7 @@ import { Flex, Select, Input, Button } from "@chakra-ui/react"
 import { SearchIcon } from "@chakra-ui/icons"
 
 interface FieldOption<T> {
-    key: keyof T
+    key: keyof T | string
     label: string
 }
 
@@ -22,9 +22,7 @@ export default function SearchBar<T extends object>({
     const [query, setQuery] = useState("")
 
     useEffect(() => {
-        // pesquisa automática conforme digita (ou troque para botão)
         handleSearch()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query, selectedField])
 
     const handleSearch = () => {
@@ -33,8 +31,8 @@ export default function SearchBar<T extends object>({
             return
         }
 
-        const filtered = data.filter((item) => {
-            const value = String(item[selectedField as keyof T] ?? "").toLowerCase()
+        const filtered = data.filter((item: any) => {
+            const value = String(item[selectedField] ?? item[selectedField.split(".")[1]] ?? "").toLowerCase()
             return value.includes(query.toLowerCase())
         })
 
@@ -44,7 +42,7 @@ export default function SearchBar<T extends object>({
     return (
         <Flex gap={3} mb={4} align="center">
             <Select
-                w="200px"
+                w="220px"
                 value={selectedField}
                 onChange={(e) => setSelectedField(e.target.value)}
             >

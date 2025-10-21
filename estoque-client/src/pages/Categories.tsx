@@ -4,7 +4,6 @@ import {
     Button,
     Flex,
     Heading,
-    Input,
     Table,
     Thead,
     Tbody,
@@ -14,9 +13,18 @@ import {
     useToast,
     Spinner,
     IconButton,
+    useDisclosure,
+    Modal,
+    ModalOverlay,
+    ModalContent,
+    ModalHeader,
+    ModalFooter,
+    ModalBody,
+    ModalCloseButton,
+    Input,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
-import { DeleteIcon, EditIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons"
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons"
 import {
     getAllCategories,
     createCategory,
@@ -31,9 +39,13 @@ export default function Categories() {
     const [description, setDescription] = useState("")
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
-    const [editingId, setEditingId] = useState<number | null>(null)
-    const [editDescription, setEditDescription] = useState("")
+    const [editingCategory, setEditingCategory] = useState<Category | null>(null)
     const toast = useToast()
+    const { isOpen, onOpen, onClose } = useDisclosure()
+
+    // 🔹 Recupera a role salva no localStorage
+    const role = localStorage.getItem("role")
+    const isAdmin = role === "ROLE_ADMIN"
 
     const loadCategories = async () => {
         try {
@@ -52,7 +64,36 @@ export default function Categories() {
         }
     }
 
-    const handleAdd = async () => {
+    const handleOpenModal = (category?: Category) => {
+        if (!isAdmin) {
+            toast({
+                title: "Acesso restrito",
+                description: "Somente administradores podem criar ou editar categorias.",
+                status: "warning",
+            })
+            return
+        }
+
+        if (category) {
+            setEditingCategory(category)
+            setDescription(category.description ?? "")
+        } else {
+            setEditingCategory(null)
+            setDescription("")
+        }
+        onOpen()
+    }
+
+    const handleSave = async () => {
+        if (!isAdmin) {
+            toast({
+                title: "Acesso restrito",
+                description: "Somente administradores podem realizar esta ação.",
+                status: "warning",
+            })
+            return
+        }
+
         if (!description.trim()) {
             toast({
                 title: "Informe uma descrição",
@@ -63,14 +104,25 @@ export default function Categories() {
 
         try {
             setSaving(true)
-            const newCategory = await createCategory({ description })
-            const updated = [...categories, newCategory]
-            setCategories(updated)
-            setFilteredCategories(updated)
-            toast({ title: "Categoria criada com sucesso!", status: "success" })
+            if (editingCategory) {
+                const updated = await updateCategory(editingCategory.id!, { description })
+                const updatedList = categories.map((c) =>
+                    c.id === updated.id ? updated : c
+                )
+                setCategories(updatedList)
+                setFilteredCategories(updatedList)
+                toast({ title: "Categoria atualizada com sucesso!", status: "success" })
+            } else {
+                const newCategory = await createCategory({ description })
+                const updatedList = [...categories, newCategory]
+                setCategories(updatedList)
+                setFilteredCategories(updatedList)
+                toast({ title: "Categoria criada com sucesso!", status: "success" })
+            }
+            onClose()
         } catch (err: any) {
             toast({
-                title: "Erro ao criar categoria",
+                title: "Erro ao salvar categoria",
                 description: err.message,
                 status: "error",
             })
@@ -80,6 +132,15 @@ export default function Categories() {
     }
 
     const handleDelete = async (id: number) => {
+        if (!isAdmin) {
+            toast({
+                title: "Acesso restrito",
+                description: "Somente administradores podem excluir categorias.",
+                status: "warning",
+            })
+            return
+        }
+
         try {
             await deleteCategory(id)
             const updatedList = categories.filter((c) => c.id !== id)
@@ -87,50 +148,13 @@ export default function Categories() {
             setFilteredCategories(updatedList)
             toast({ title: "Categoria excluída", status: "info" })
         } catch (err: any) {
+            const errorMessage =
+                err.response?.data?.message || "Erro ao excluir categoria"
             toast({
                 title: "Erro ao excluir categoria",
-                description: err.message,
+                description: errorMessage,
                 status: "error",
             })
-        }
-    }
-
-    const handleEdit = (category: Category) => {
-        setEditingId(category.id!)
-        setEditDescription(category.description ?? "")
-    }
-
-    const handleCancelEdit = () => {
-        setEditingId(null)
-        setEditDescription("")
-    }
-
-    const handleUpdate = async (id: number) => {
-        if (!editDescription.trim()) {
-            toast({
-                title: "Informe uma descrição",
-                status: "warning",
-            })
-            return
-        }
-
-        try {
-            setSaving(true)
-            const updated = await updateCategory(id, { description: editDescription })
-            const updatedList = categories.map((c) => (c.id === id ? updated : c))
-            setCategories(updatedList)
-            setFilteredCategories(updatedList)
-            toast({ title: "Categoria atualizada com sucesso!", status: "success" })
-            setEditingId(null)
-            setEditDescription("")
-        } catch (err: any) {
-            toast({
-                title: "Erro ao atualizar categoria",
-                description: err.message,
-                status: "error",
-            })
-        } finally {
-            setSaving(false)
         }
     }
 
@@ -140,9 +164,17 @@ export default function Categories() {
 
     return (
         <Box>
-            <Heading size="lg" mb={6} color="teal.600">
-                Categorias
-            </Heading>
+            <Flex justify="space-between" align="center" mb={6}>
+                <Heading size="lg" color="teal.600">
+                    Categorias
+                </Heading>
+
+                {isAdmin && (
+                    <Button colorScheme="teal" onClick={() => handleOpenModal()}>
+                        Adicionar
+                    </Button>
+                )}
+            </Flex>
 
             <SearchBar
                 data={categories}
@@ -153,73 +185,31 @@ export default function Categories() {
                 onSearch={setFilteredCategories}
             />
 
-            <Flex gap={4} mb={6}>
-                <Input
-                    placeholder="Descrição da categoria"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    w="50%"
-                />
-                <Button colorScheme="teal" onClick={handleAdd} isLoading={saving}>
-                    Adicionar
-                </Button>
-            </Flex>
-
             {loading ? (
                 <Spinner />
             ) : (
-                <Table variant="simple">
+                <Table variant="simple" mt={4}>
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
                             <Th>Descrição</Th>
-                            <Th textAlign="center">Ações</Th>
+                            {isAdmin && <Th textAlign="center">Ações</Th>}
                         </Tr>
                     </Thead>
                     <Tbody>
                         {filteredCategories.map((category) => (
                             <Tr key={category.id}>
                                 <Td>{category.id}</Td>
-
-                                <Td>
-                                    {editingId === category.id ? (
-                                        <Input
-                                            value={editDescription}
-                                            onChange={(e) => setEditDescription(e.target.value)}
-                                            size="sm"
-                                        />
-                                    ) : (
-                                        category.description
-                                    )}
-                                </Td>
-
-                                <Td textAlign="center">
-                                    {editingId === category.id ? (
-                                        <Flex justify="center" gap={2}>
-                                            <IconButton
-                                                aria-label="Salvar"
-                                                colorScheme="green"
-                                                size="sm"
-                                                icon={<CheckIcon />}
-                                                isLoading={saving}
-                                                onClick={() => handleUpdate(category.id!)}
-                                            />
-                                            <IconButton
-                                                aria-label="Cancelar"
-                                                colorScheme="gray"
-                                                size="sm"
-                                                icon={<CloseIcon />}
-                                                onClick={handleCancelEdit}
-                                            />
-                                        </Flex>
-                                    ) : (
+                                <Td>{category.description}</Td>
+                                {isAdmin && (
+                                    <Td textAlign="center">
                                         <Flex justify="center" gap={2}>
                                             <IconButton
                                                 aria-label="Editar"
                                                 colorScheme="blue"
                                                 size="sm"
                                                 icon={<EditIcon />}
-                                                onClick={() => handleEdit(category)}
+                                                onClick={() => handleOpenModal(category)}
                                             />
                                             <IconButton
                                                 aria-label="Excluir"
@@ -229,13 +219,46 @@ export default function Categories() {
                                                 onClick={() => handleDelete(category.id!)}
                                             />
                                         </Flex>
-                                    )}
-                                </Td>
+                                    </Td>
+                                )}
                             </Tr>
                         ))}
                     </Tbody>
                 </Table>
             )}
+
+            {/* Modal de inclusão/edição */}
+            <Modal isOpen={isOpen} onClose={onClose} isCentered>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
+                        {editingCategory ? "Editar Categoria" : "Nova Categoria"}
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <Input
+                            placeholder="Descrição da categoria"
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            isDisabled={!isAdmin}
+                        />
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button variant="ghost" mr={3} onClick={onClose}>
+                            Cancelar
+                        </Button>
+                        {isAdmin && (
+                            <Button
+                                colorScheme="teal"
+                                onClick={handleSave}
+                                isLoading={saving}
+                            >
+                                Salvar
+                            </Button>
+                        )}
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
         </Box>
     )
 }
