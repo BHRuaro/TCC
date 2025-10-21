@@ -23,9 +23,11 @@ public class Supplier implements Identifiable<Long> {
     private Long id;
 
     @NotBlank(message = "O nome do fornecedor não pode ser vazio.")
+    @Column(nullable = false, length = 100)
     private String name;
 
     @NotBlank(message = "O CNPJ do fornecedor não pode ser vazio.")
+    @Column(nullable = false, unique = true)
     private String cnpj;
 
     @ManyToOne

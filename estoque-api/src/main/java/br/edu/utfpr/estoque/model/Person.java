@@ -18,6 +18,7 @@ public class Person implements Identifiable<Long> {
     private Long id;
 
     @NotBlank
+    @Column(unique = true, nullable = false)
     private String cpf;
 
     @NotBlank
