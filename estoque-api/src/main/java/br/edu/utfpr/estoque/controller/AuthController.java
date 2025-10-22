@@ -44,7 +44,7 @@ public class AuthController {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        String token = jwtService.generateToken(request.getUsername());
+        String token = jwtService.generateToken(user);
         long expiresIn = jwtService.getJwtExpirationMs() / 1000;
 
         AuthResponse response = new AuthResponse(token, expiresIn, user.getRole(), user.getName());
