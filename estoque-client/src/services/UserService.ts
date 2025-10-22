@@ -28,7 +28,6 @@ export async function deleteUser(id: number): Promise<void> {
     await api.delete(`/users/${id}`)
 }
 
-// 🔑 endpoint específico para trocar senha
 export async function changePassword(id: number, newPassword: string): Promise<void> {
     await api.patch(`/users/${id}/password`, { newPassword })
 }

@@ -53,7 +53,6 @@ export default function Persons() {
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    // ✅ Máscara de CPF
     const formatCPF = (value: string) => {
         const cleaned = value.replace(/\D/g, "").slice(0, 11)
         if (cleaned.length <= 3) return cleaned
@@ -63,20 +62,17 @@ export default function Persons() {
         return cleaned.replace(/^(\d{3})(\d{3})(\d{3})(\d{0,2}).*/, "$1.$2.$3-$4")
     }
 
-    // ✅ Validação de CPF (mínima)
     const isValidCPF = (value: string) => {
         const digits = value.replace(/\D/g, "")
         return /^\d{11}$/.test(digits)
     }
 
-    // ✅ Validação de e-mail simples
     const isValidEmail = (value: string) => {
-        if (!value) return true // opcional
+        if (!value) return true
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return regex.test(value)
     }
 
-    // Usuário logado
     useEffect(() => {
         const storedUser = localStorage.getItem("user")
         if (storedUser) setUser(JSON.parse(storedUser))
@@ -260,7 +256,6 @@ export default function Persons() {
                 </Table>
             )}
 
-            {/* MODAL */}
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
                 <ModalOverlay />
                 <ModalContent>

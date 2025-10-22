@@ -25,8 +25,9 @@ import {
     Switch,
     Select,
     SimpleGrid,
+    Tooltip,
 } from "@chakra-ui/react"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons"
 import { FaKey } from "react-icons/fa"
 import SearchBar from "../components/SearchBar"
@@ -38,6 +39,19 @@ import {
     changePassword,
     type User,
 } from "../services/UserService"
+
+// Função para decodificar o campo "sub" (username) do JWT
+function decodeJwtSub(token?: string | null): string | null {
+    try {
+        if (!token) return null
+        const [, payload] = token.split(".")
+        if (!payload) return null
+        const json = JSON.parse(atob(payload))
+        return json?.sub ?? null
+    } catch {
+        return null
+    }
+}
 
 export default function Users() {
     const [users, setUsers] = useState<User[]>([])
@@ -54,16 +68,14 @@ export default function Users() {
     const [saving, setSaving] = useState(false)
     const toast = useToast()
 
-    const {
-        isOpen: isEditOpen,
-        onOpen: onEditOpen,
-        onClose: onEditClose,
-    } = useDisclosure()
-    const {
-        isOpen: isPasswordOpen,
-        onOpen: onPasswordOpen,
-        onClose: onPasswordClose,
-    } = useDisclosure()
+    const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
+    const { isOpen: isPasswordOpen, onOpen: onPasswordOpen, onClose: onPasswordClose } = useDisclosure()
+
+    // 🔹 pega info do logado
+    const token = localStorage.getItem("token")
+    const loggedUsername = useMemo(() => decodeJwtSub(token), [token])
+    const roleStorage = localStorage.getItem("role")
+    const isAdmin = roleStorage === "ROLE_ADMIN"
 
     const loadUsers = async () => {
         try {
@@ -170,7 +182,15 @@ export default function Users() {
         }
     }
 
-    const handleOpenPasswordModal = (id: number) => {
+    const handleOpenPasswordModal = (id: number, username: string) => {
+        if (!isAdmin && username !== loggedUsername) {
+            toast({
+                title: "Acesso negado",
+                description: "Você só pode alterar a sua própria senha.",
+                status: "warning",
+            })
+            return
+        }
         setSelectedUserId(id)
         setNewPassword("")
         onPasswordOpen()
@@ -204,9 +224,11 @@ export default function Users() {
                 <Heading size="lg" color="teal.600">
                     Usuários
                 </Heading>
-                <Button colorScheme="teal" onClick={() => handleOpenEdit()}>
-                    Adicionar
-                </Button>
+                <Tooltip label="Somente administradores podem criar usuários" isDisabled={isAdmin}>
+                    <Button colorScheme="teal" onClick={() => handleOpenEdit()} isDisabled={!isAdmin}>
+                        Adicionar
+                    </Button>
+                </Tooltip>
             </Flex>
 
             <SearchBar
@@ -235,115 +257,67 @@ export default function Users() {
                         </Tr>
                     </Thead>
                     <Tbody>
-                        {filteredUsers.map((u) => (
-                            <Tr key={u.id}>
-                                <Td>{u.id}</Td>
-                                <Td>{u.name}</Td>
-                                <Td>{u.username}</Td>
-                                <Td>{u.role === "ROLE_ADMIN" ? "Admin" : "Usuário"}</Td>
-                                <Td>{u.active ? "Sim" : "Não"}</Td>
-                                <Td textAlign="center">
-                                    <Flex justify="center" gap={2}>
-                                        <IconButton
-                                            aria-label="Editar"
-                                            colorScheme="blue"
-                                            size="sm"
-                                            icon={<EditIcon />}
-                                            onClick={() => handleOpenEdit(u)}
-                                        />
-                                        <IconButton
-                                            aria-label="Trocar senha"
-                                            colorScheme="yellow"
-                                            size="sm"
-                                            icon={<FaKey />}
-                                            onClick={() => handleOpenPasswordModal(u.id!)}
-                                        />
-                                        <IconButton
-                                            aria-label="Excluir"
-                                            colorScheme="red"
-                                            size="sm"
-                                            icon={<DeleteIcon />}
-                                            onClick={() => handleDelete(u.id!)}
-                                        />
-                                    </Flex>
-                                </Td>
-                            </Tr>
-                        ))}
+                        {filteredUsers.map((u) => {
+                            const canChangeOwnPassword = u.username === loggedUsername || isAdmin
+
+                            return (
+                                <Tr key={u.id}>
+                                    <Td>{u.id}</Td>
+                                    <Td>{u.name}</Td>
+                                    <Td>{u.username}</Td>
+                                    <Td>{u.role === "ROLE_ADMIN" ? "Admin" : "Usuário"}</Td>
+                                    <Td>{u.active ? "Sim" : "Não"}</Td>
+                                    <Td textAlign="center">
+                                        <Flex justify="center" gap={2}>
+                                            <Tooltip label="Somente administradores podem editar" isDisabled={isAdmin}>
+                                                <IconButton
+                                                    aria-label="Editar"
+                                                    colorScheme="blue"
+                                                    size="sm"
+                                                    icon={<EditIcon />}
+                                                    onClick={() => handleOpenEdit(u)}
+                                                    isDisabled={!isAdmin}
+                                                />
+                                            </Tooltip>
+
+                                            <Tooltip
+                                                label={
+                                                    canChangeOwnPassword
+                                                        ? "Alterar senha"
+                                                        : "Você só pode alterar a sua própria senha"
+                                                }
+                                                isDisabled={canChangeOwnPassword}
+                                            >
+                                                <IconButton
+                                                    aria-label="Trocar senha"
+                                                    colorScheme="yellow"
+                                                    size="sm"
+                                                    icon={<FaKey />}
+                                                    onClick={() => handleOpenPasswordModal(u.id!, u.username)}
+                                                    isDisabled={!canChangeOwnPassword}
+                                                />
+                                            </Tooltip>
+
+                                            <Tooltip label="Somente administradores podem excluir" isDisabled={isAdmin}>
+                                                <IconButton
+                                                    aria-label="Excluir"
+                                                    colorScheme="red"
+                                                    size="sm"
+                                                    icon={<DeleteIcon />}
+                                                    onClick={() => handleDelete(u.id!)}
+                                                    isDisabled={!isAdmin}
+                                                />
+                                            </Tooltip>
+                                        </Flex>
+                                    </Td>
+                                </Tr>
+                            )
+                        })}
                     </Tbody>
                 </Table>
             )}
 
-            {/* MODAL DE CRIAÇÃO/EDIÇÃO */}
-            <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered size="lg">
-                <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
-                        {editingUser ? "Editar Usuário" : "Novo Usuário"}
-                    </ModalHeader>
-                    <ModalCloseButton />
-                    <ModalBody>
-                        <SimpleGrid columns={2} spacing={4}>
-                            <Box>
-                                <FormLabel>Nome</FormLabel>
-                                <Input
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    maxLength={100}
-                                    mb={3}
-                                />
-                            </Box>
-                            <Box>
-                                <FormLabel>Usuário</FormLabel>
-                                <Input
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    maxLength={60}
-                                    mb={3}
-                                />
-                            </Box>
-                            {!editingUser && (
-                                <Box>
-                                    <FormLabel>Senha</FormLabel>
-                                    <Input
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        mb={3}
-                                    />
-                                </Box>
-                            )}
-                            <Box>
-                                <FormLabel>Função</FormLabel>
-                                <Select value={role} onChange={(e) => setRole(e.target.value)} mb={3}>
-                                    <option value="ROLE_ADMIN">Admin</option>
-                                    <option value="ROLE_USER">Usuário</option>
-                                </Select>
-                            </Box>
-                            <Box>
-                                <FormLabel>Ativo</FormLabel>
-                                <Switch
-                                    isChecked={active}
-                                    onChange={(e) => setActive(e.target.checked)}
-                                    colorScheme="teal"
-                                    size="lg"
-                                    mt={1}
-                                />
-                            </Box>
-                        </SimpleGrid>
-                    </ModalBody>
-
-                    <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onEditClose}>
-                            Cancelar
-                        </Button>
-                        <Button colorScheme="teal" onClick={handleSave} isLoading={saving}>
-                            Salvar
-                        </Button>
-                    </ModalFooter>
-                </ModalContent>
-            </Modal>
-
-            {/* MODAL DE TROCA DE SENHA */}
+            {/* MODAL TROCA DE SENHA */}
             <Modal isOpen={isPasswordOpen} onClose={onPasswordClose} isCentered size="md">
                 <ModalOverlay />
                 <ModalContent>
@@ -362,11 +336,7 @@ export default function Users() {
                         <Button variant="ghost" mr={3} onClick={onPasswordClose}>
                             Cancelar
                         </Button>
-                        <Button
-                            colorScheme="teal"
-                            onClick={handleChangePassword}
-                            isLoading={saving}
-                        >
+                        <Button colorScheme="teal" onClick={handleChangePassword} isLoading={saving}>
                             Alterar
                         </Button>
                     </ModalFooter>

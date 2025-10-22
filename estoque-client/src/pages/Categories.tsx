@@ -22,6 +22,7 @@ import {
     ModalBody,
     ModalCloseButton,
     Input,
+    Tooltip,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons"
@@ -43,7 +44,6 @@ export default function Categories() {
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    // 🔹 Recupera a role salva no localStorage
     const role = localStorage.getItem("role")
     const isAdmin = role === "ROLE_ADMIN"
 
@@ -65,15 +65,6 @@ export default function Categories() {
     }
 
     const handleOpenModal = (category?: Category) => {
-        if (!isAdmin) {
-            toast({
-                title: "Acesso restrito",
-                description: "Somente administradores podem criar ou editar categorias.",
-                status: "warning",
-            })
-            return
-        }
-
         if (category) {
             setEditingCategory(category)
             setDescription(category.description ?? "")
@@ -85,15 +76,6 @@ export default function Categories() {
     }
 
     const handleSave = async () => {
-        if (!isAdmin) {
-            toast({
-                title: "Acesso restrito",
-                description: "Somente administradores podem realizar esta ação.",
-                status: "warning",
-            })
-            return
-        }
-
         if (!description.trim()) {
             toast({
                 title: "Informe uma descrição",
@@ -132,15 +114,6 @@ export default function Categories() {
     }
 
     const handleDelete = async (id: number) => {
-        if (!isAdmin) {
-            toast({
-                title: "Acesso restrito",
-                description: "Somente administradores podem excluir categorias.",
-                status: "warning",
-            })
-            return
-        }
-
         try {
             await deleteCategory(id)
             const updatedList = categories.filter((c) => c.id !== id)
@@ -169,11 +142,18 @@ export default function Categories() {
                     Categorias
                 </Heading>
 
-                {isAdmin && (
-                    <Button colorScheme="teal" onClick={() => handleOpenModal()}>
+                <Tooltip
+                    label="Somente administradores podem criar categorias"
+                    isDisabled={isAdmin}
+                >
+                    <Button
+                        colorScheme="teal"
+                        onClick={() => handleOpenModal()}
+                        isDisabled={!isAdmin}
+                    >
                         Adicionar
                     </Button>
-                )}
+                </Tooltip>
             </Flex>
 
             <SearchBar
@@ -193,7 +173,7 @@ export default function Categories() {
                         <Tr>
                             <Th>ID</Th>
                             <Th>Descrição</Th>
-                            {isAdmin && <Th textAlign="center">Ações</Th>}
+                            <Th textAlign="center">Ações</Th>
                         </Tr>
                     </Thead>
                     <Tbody>
@@ -201,33 +181,42 @@ export default function Categories() {
                             <Tr key={category.id}>
                                 <Td>{category.id}</Td>
                                 <Td>{category.description}</Td>
-                                {isAdmin && (
-                                    <Td textAlign="center">
-                                        <Flex justify="center" gap={2}>
+                                <Td textAlign="center">
+                                    <Flex justify="center" gap={2}>
+                                        <Tooltip
+                                            label="Somente administradores podem editar"
+                                            isDisabled={isAdmin}
+                                        >
                                             <IconButton
                                                 aria-label="Editar"
                                                 colorScheme="blue"
                                                 size="sm"
                                                 icon={<EditIcon />}
                                                 onClick={() => handleOpenModal(category)}
+                                                isDisabled={!isAdmin}
                                             />
+                                        </Tooltip>
+                                        <Tooltip
+                                            label="Somente administradores podem excluir"
+                                            isDisabled={isAdmin}
+                                        >
                                             <IconButton
                                                 aria-label="Excluir"
                                                 colorScheme="red"
                                                 size="sm"
                                                 icon={<DeleteIcon />}
                                                 onClick={() => handleDelete(category.id!)}
+                                                isDisabled={!isAdmin}
                                             />
-                                        </Flex>
-                                    </Td>
-                                )}
+                                        </Tooltip>
+                                    </Flex>
+                                </Td>
                             </Tr>
                         ))}
                     </Tbody>
                 </Table>
             )}
 
-            {/* Modal de inclusão/edição */}
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent>
@@ -247,15 +236,19 @@ export default function Categories() {
                         <Button variant="ghost" mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
-                        {isAdmin && (
+                        <Tooltip
+                            label="Somente administradores podem salvar alterações"
+                            isDisabled={isAdmin}
+                        >
                             <Button
                                 colorScheme="teal"
                                 onClick={handleSave}
                                 isLoading={saving}
+                                isDisabled={!isAdmin}
                             >
                                 Salvar
                             </Button>
-                        )}
+                        </Tooltip>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

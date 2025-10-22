@@ -23,6 +23,7 @@ import {
     ModalCloseButton,
     Input,
     FormLabel,
+    Tooltip,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons"
@@ -51,6 +52,10 @@ export default function Suppliers() {
     const [editingSupplier, setEditingSupplier] = useState<Supplier | null>(null)
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
+
+    // 🔹 Recupera a role do localStorage
+    const role = localStorage.getItem("role")
+    const isAdmin = role === "ROLE_ADMIN"
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user")
@@ -199,9 +204,19 @@ export default function Suppliers() {
                 <Heading size="lg" color="teal.600">
                     Fornecedores
                 </Heading>
-                <Button colorScheme="teal" onClick={() => handleOpenModal()}>
-                    Adicionar
-                </Button>
+
+                <Tooltip
+                    label="Somente administradores podem adicionar fornecedores"
+                    isDisabled={isAdmin}
+                >
+                    <Button
+                        colorScheme="teal"
+                        onClick={() => handleOpenModal()}
+                        isDisabled={!isAdmin}
+                    >
+                        Adicionar
+                    </Button>
+                </Tooltip>
             </Flex>
 
             <SearchBar
@@ -242,20 +257,32 @@ export default function Suppliers() {
                                 </Td>
                                 <Td textAlign="center">
                                     <Flex justify="center" gap={2}>
-                                        <IconButton
-                                            aria-label="Editar"
-                                            colorScheme="blue"
-                                            size="sm"
-                                            icon={<EditIcon />}
-                                            onClick={() => handleOpenModal(supplier)}
-                                        />
-                                        <IconButton
-                                            aria-label="Excluir"
-                                            colorScheme="red"
-                                            size="sm"
-                                            icon={<DeleteIcon />}
-                                            onClick={() => handleDelete(supplier.id!)}
-                                        />
+                                        <Tooltip
+                                            label="Somente administradores podem editar"
+                                            isDisabled={isAdmin}
+                                        >
+                                            <IconButton
+                                                aria-label="Editar"
+                                                colorScheme="blue"
+                                                size="sm"
+                                                icon={<EditIcon />}
+                                                onClick={() => handleOpenModal(supplier)}
+                                                isDisabled={!isAdmin}
+                                            />
+                                        </Tooltip>
+                                        <Tooltip
+                                            label="Somente administradores podem excluir"
+                                            isDisabled={isAdmin}
+                                        >
+                                            <IconButton
+                                                aria-label="Excluir"
+                                                colorScheme="red"
+                                                size="sm"
+                                                icon={<DeleteIcon />}
+                                                onClick={() => handleDelete(supplier.id!)}
+                                                isDisabled={!isAdmin}
+                                            />
+                                        </Tooltip>
                                     </Flex>
                                 </Td>
                             </Tr>
@@ -264,7 +291,6 @@ export default function Suppliers() {
                 </Table>
             )}
 
-            {/* MODAL */}
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
                 <ModalContent>
@@ -279,6 +305,7 @@ export default function Suppliers() {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             mb={3}
+                            isDisabled={!isAdmin}
                         />
                         <FormLabel>CNPJ</FormLabel>
                         <Input
@@ -287,6 +314,7 @@ export default function Suppliers() {
                             onChange={(e) => setCnpj(formatCNPJ(e.target.value))}
                             maxLength={18}
                             mb={3}
+                            isDisabled={!isAdmin}
                         />
                         <FormLabel>Usuário</FormLabel>
                         <Input
@@ -301,9 +329,19 @@ export default function Suppliers() {
                         <Button variant="ghost" mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button colorScheme="teal" onClick={handleSave} isLoading={saving}>
-                            Salvar
-                        </Button>
+                        <Tooltip
+                            label="Somente administradores podem salvar alterações"
+                            isDisabled={isAdmin}
+                        >
+                            <Button
+                                colorScheme="teal"
+                                onClick={handleSave}
+                                isLoading={saving}
+                                isDisabled={!isAdmin}
+                            >
+                                Salvar
+                            </Button>
+                        </Tooltip>
                     </ModalFooter>
                 </ModalContent>
             </Modal>

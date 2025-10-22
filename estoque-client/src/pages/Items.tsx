@@ -283,7 +283,6 @@ export default function Items() {
                 </Table>
             )}
 
-            {/* MODAL */}
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="6xl">
                 <ModalOverlay />
                 <ModalContent>
