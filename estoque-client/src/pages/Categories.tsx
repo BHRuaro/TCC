@@ -139,7 +139,7 @@ export default function Categories() {
     return (
         <Box>
             <Flex justify="space-between" align="center" mb={6}>
-                <Heading size="lg" color="teal.600">
+                <Heading size="lg" color="teal.600" id="heading-categories">
                     Categorias
                 </Heading>
 
@@ -148,6 +148,7 @@ export default function Categories() {
                     isDisabled={isAdmin}
                 >
                     <Button
+                        id="btn-add-category"
                         colorScheme="teal"
                         onClick={() => handleOpenModal()}
                         isDisabled={!isAdmin}
@@ -167,9 +168,9 @@ export default function Categories() {
             />
 
             {loading ? (
-                <Spinner />
+                <Spinner id="spinner-categories" />
             ) : (
-                <Table variant="simple" mt={4}>
+                <Table variant="simple" mt={4} id="table-categories">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -179,7 +180,7 @@ export default function Categories() {
                     </Thead>
                     <Tbody>
                         {filteredCategories.map((category) => (
-                            <Tr key={category.id}>
+                            <Tr key={category.id} id={`row-category-${category.id}`}>
                                 <Td>{category.id}</Td>
                                 <Td>{category.description}</Td>
                                 <Td textAlign="center">
@@ -189,6 +190,7 @@ export default function Categories() {
                                             isDisabled={isAdmin}
                                         >
                                             <IconButton
+                                                id={`btn-edit-category-${category.id}`}
                                                 aria-label="Editar"
                                                 colorScheme="blue"
                                                 size="sm"
@@ -202,6 +204,7 @@ export default function Categories() {
                                             isDisabled={isAdmin}
                                         >
                                             <IconButton
+                                                id={`btn-delete-category-${category.id}`}
                                                 aria-label="Excluir"
                                                 colorScheme="red"
                                                 size="sm"
@@ -220,14 +223,15 @@ export default function Categories() {
 
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
+                <ModalContent id="modal-category">
+                    <ModalHeader id="modal-category-header">
                         {editingCategory ? "Editar Categoria" : "Nova Categoria"}
                     </ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton id="btn-close-category" />
                     <ModalBody>
                         <RequiredLabel>Descrição da categoria</RequiredLabel>
                         <Input
+                            id="input-category-description"
                             placeholder="Ex: Equipamentos de escritório"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -235,7 +239,12 @@ export default function Categories() {
                         />
                     </ModalBody>
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onClose}>
+                        <Button
+                            id="btn-cancel-category"
+                            variant="ghost"
+                            mr={3}
+                            onClick={onClose}
+                        >
                             Cancelar
                         </Button>
                         <Tooltip
@@ -243,6 +252,7 @@ export default function Categories() {
                             isDisabled={isAdmin}
                         >
                             <Button
+                                id="btn-save-category"
                                 colorScheme="teal"
                                 onClick={handleSave}
                                 isLoading={saving}

@@ -66,9 +66,10 @@ export default function SearchBar<T extends object>({
                 placeholder="Pesquisar..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                id="input-search"
             />
 
-            <Button colorScheme="teal" leftIcon={<SearchIcon />} onClick={handleSearch}>
+            <Button colorScheme="teal" leftIcon={<SearchIcon />} onClick={handleSearch} id="button-search">
                 Buscar
             </Button>
         </Flex>

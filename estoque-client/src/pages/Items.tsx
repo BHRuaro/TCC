@@ -213,10 +213,10 @@ export default function Items() {
     return (
         <Box>
             <Flex justify="space-between" align="center" mb={6}>
-                <Heading size="lg" color="teal.600">
+                <Heading size="lg" color="teal.600" id="heading-items">
                     Itens
                 </Heading>
-                <Button colorScheme="teal" onClick={() => handleOpenModal()}>
+                <Button id="btn-add-item" colorScheme="teal" onClick={() => handleOpenModal()}>
                     Adicionar
                 </Button>
             </Flex>
@@ -233,10 +233,11 @@ export default function Items() {
                 onSearch={setFilteredItems}
                 onReload={loadData}
             />
+
             {loading ? (
-                <Spinner />
+                <Spinner id="spinner-items" />
             ) : (
-                <Table variant="simple" mt={4}>
+                <Table variant="simple" mt={4} id="table-items">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -254,7 +255,7 @@ export default function Items() {
                             const category = categories.find((c) => c.id === item.categoryId)
                             const supplier = suppliers.find((s) => s.id === item.supplierId)
                             return (
-                                <Tr key={item.id}>
+                                <Tr key={item.id} id={`row-item-${item.id}`}>
                                     <Td>{item.id}</Td>
                                     <Td>{item.name}</Td>
                                     <Td>R$ {item.unitPrice?.toFixed(2)}</Td>
@@ -275,6 +276,7 @@ export default function Items() {
                                     <Td textAlign="center">
                                         <Flex justify="center" gap={2}>
                                             <IconButton
+                                                id={`btn-edit-item-${item.id}`}
                                                 aria-label="Editar"
                                                 colorScheme="blue"
                                                 size="sm"
@@ -282,6 +284,7 @@ export default function Items() {
                                                 onClick={() => handleOpenModal(item)}
                                             />
                                             <IconButton
+                                                id={`btn-delete-item-${item.id}`}
                                                 aria-label="Excluir"
                                                 colorScheme="red"
                                                 size="sm"
@@ -299,32 +302,43 @@ export default function Items() {
 
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="6xl">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
+                <ModalContent id="modal-item">
+                    <ModalHeader id="modal-item-header">
                         {editingItem ? "Editar Item" : "Novo Item"}
                     </ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton id="btn-close-item" />
                     <ModalBody>
                         <SimpleGrid columns={2} spacing={4}>
                             <Box>
-                                <RequiredLabel>
-                                    Nome
-                                </RequiredLabel>
-                                <Input value={name} onChange={(e) => setName(e.target.value)} mb={3} />
+                                <RequiredLabel>Nome</RequiredLabel>
+                                <Input
+                                    id="input-item-name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    mb={3}
+                                />
                             </Box>
 
                             <Box>
                                 <FormLabel>Descrição</FormLabel>
-                                <Input value={description} onChange={(e) => setDescription(e.target.value)} mb={3} />
+                                <Input
+                                    id="input-item-description"
+                                    value={description}
+                                    onChange={(e) => setDescription(e.target.value)}
+                                    mb={3}
+                                />
                             </Box>
 
                             <Box>
                                 <FormLabel>Preço Unitário</FormLabel>
                                 <Input
+                                    id="input-item-unitprice"
                                     type="number"
                                     min={0}
                                     value={unitPrice}
-                                    onChange={(e) => setUnitPrice(e.target.value ? Number(e.target.value) : "")}
+                                    onChange={(e) =>
+                                        setUnitPrice(e.target.value ? Number(e.target.value) : "")
+                                    }
                                     mb={3}
                                 />
                             </Box>
@@ -332,10 +346,13 @@ export default function Items() {
                             <Box>
                                 <FormLabel>Estoque Atual</FormLabel>
                                 <Input
+                                    id="input-item-stock"
                                     type="number"
                                     min={0}
                                     value={stockQuantity}
-                                    onChange={(e) => setStockQuantity(e.target.value ? Number(e.target.value) : "")}
+                                    onChange={(e) =>
+                                        setStockQuantity(e.target.value ? Number(e.target.value) : "")
+                                    }
                                     mb={3}
                                 />
                             </Box>
@@ -344,18 +361,28 @@ export default function Items() {
                                 <HStack spacing={1}>
                                     <FormLabel mb={0}>Estoque Mínimo</FormLabel>
                                     <Tooltip
-                                        label="Ao atingir o estoque mínimo, o sistema irá alertá-lo sobre a necessidade de reposição deste item. Deixe em branco para não aplicar um estoque mínimo."
+                                        label="Ao atingir o estoque mínimo, o sistema irá alertá-lo sobre a necessidade de reposição deste item."
                                         hasArrow
                                         placement="top"
                                     >
-                                        <Icon as={QuestionIcon} color="teal.500" cursor="pointer" boxSize={4} />
+                                        <Icon
+                                            as={QuestionIcon}
+                                            color="teal.500"
+                                            cursor="pointer"
+                                            boxSize={4}
+                                        />
                                     </Tooltip>
                                 </HStack>
                                 <Input
+                                    id="input-item-minstock"
                                     type="number"
                                     min={0}
                                     value={minStockQuantity}
-                                    onChange={(e) => setMinStockQuantity(e.target.value ? Number(e.target.value) : "")}
+                                    onChange={(e) =>
+                                        setMinStockQuantity(
+                                            e.target.value ? Number(e.target.value) : ""
+                                        )
+                                    }
                                     mb={3}
                                 />
                             </Box>
@@ -364,18 +391,26 @@ export default function Items() {
                                 <HStack spacing={1}>
                                     <FormLabel mb={0}>Limite de Movimentação</FormLabel>
                                     <Tooltip
-                                        label="O limite de movimentação define a quantidade máxima de saídas permitidas para este item por movimentação. Deixe em branco para não aplicar um limite."
+                                        label="Define a quantidade máxima de saídas permitidas por movimentação."
                                         hasArrow
                                         placement="top"
                                     >
-                                        <Icon as={QuestionIcon} color="teal.500" cursor="pointer" boxSize={4} />
+                                        <Icon
+                                            as={QuestionIcon}
+                                            color="teal.500"
+                                            cursor="pointer"
+                                            boxSize={4}
+                                        />
                                     </Tooltip>
                                 </HStack>
                                 <Input
+                                    id="input-item-limit"
                                     type="number"
                                     min={0}
                                     value={movementLimit}
-                                    onChange={(e) => setMovementLimit(e.target.value ? Number(e.target.value) : "")}
+                                    onChange={(e) =>
+                                        setMovementLimit(e.target.value ? Number(e.target.value) : "")
+                                    }
                                     mb={3}
                                 />
                             </Box>
@@ -384,14 +419,20 @@ export default function Items() {
                                 <HStack spacing={1}>
                                     <FormLabel mb={0}>Data de Validade</FormLabel>
                                     <Tooltip
-                                        label="Ao atingir a data de validade, o sistema irá alertá-lo sobre a necessidade de reposição deste item. Deixe em branco se o item não tiver validade."
+                                        label="O sistema alertará ao atingir a data de validade, se houver."
                                         hasArrow
                                         placement="top"
                                     >
-                                        <Icon as={QuestionIcon} color="teal.500" cursor="pointer" boxSize={4} />
+                                        <Icon
+                                            as={QuestionIcon}
+                                            color="teal.500"
+                                            cursor="pointer"
+                                            boxSize={4}
+                                        />
                                     </Tooltip>
                                 </HStack>
                                 <Input
+                                    id="input-item-expiration"
                                     type="date"
                                     value={expirationDate}
                                     onChange={(e) => setExpirationDate(e.target.value)}
@@ -401,7 +442,13 @@ export default function Items() {
 
                             <Box>
                                 <RequiredLabel>Categoria</RequiredLabel>
-                                <Select placeholder="Selecione a categoria" value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))} mb={3}>
+                                <Select
+                                    id="select-item-category"
+                                    placeholder="Selecione a categoria"
+                                    value={categoryId}
+                                    onChange={(e) => setCategoryId(Number(e.target.value))}
+                                    mb={3}
+                                >
                                     {categories.map((c) => (
                                         <option key={c.id} value={c.id}>
                                             {`${c.id} - ${c.description}`}
@@ -412,7 +459,13 @@ export default function Items() {
 
                             <Box>
                                 <RequiredLabel>Fornecedor</RequiredLabel>
-                                <Select placeholder="Selecione o fornecedor" value={supplierId} onChange={(e) => setSupplierId(Number(e.target.value))} mb={3}>
+                                <Select
+                                    id="select-item-supplier"
+                                    placeholder="Selecione o fornecedor"
+                                    value={supplierId}
+                                    onChange={(e) => setSupplierId(Number(e.target.value))}
+                                    mb={3}
+                                >
                                     {suppliers.map((s) => (
                                         <option key={s.id} value={s.id}>
                                             {`${s.id} - ${s.name}`}
@@ -424,6 +477,7 @@ export default function Items() {
                             <Box>
                                 <FormLabel>Usuário</FormLabel>
                                 <Input
+                                    id="input-item-user"
                                     value={user ? `${user.id} - ${user.name}` : ""}
                                     isReadOnly
                                     bg="gray.100"
@@ -435,10 +489,15 @@ export default function Items() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onClose}>
+                        <Button id="btn-cancel-item" variant="ghost" mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button colorScheme="teal" onClick={handleSave} isLoading={saving}>
+                        <Button
+                            id="btn-save-item"
+                            colorScheme="teal"
+                            onClick={handleSave}
+                            isLoading={saving}
+                        >
                             Salvar
                         </Button>
                     </ModalFooter>
@@ -446,4 +505,5 @@ export default function Items() {
             </Modal>
         </Box>
     )
+
 }

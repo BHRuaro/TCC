@@ -111,6 +111,7 @@ export default function Login() {
                         size="lg"
                         fontWeight="bold"
                         isLoading={loading}
+                        id="button-login"
                     >
                         Entrar
                     </Button>

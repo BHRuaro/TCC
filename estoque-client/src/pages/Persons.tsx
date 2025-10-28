@@ -190,10 +190,14 @@ export default function Persons() {
     return (
         <Box>
             <Flex justify="space-between" align="center" mb={6}>
-                <Heading size="lg" color="teal.600">
+                <Heading size="lg" color="teal.600" id="heading-persons">
                     Pessoas
                 </Heading>
-                <Button colorScheme="teal" onClick={() => handleOpenModal()}>
+                <Button
+                    id="btn-add-person"
+                    colorScheme="teal"
+                    onClick={() => handleOpenModal()}
+                >
                     Adicionar
                 </Button>
             </Flex>
@@ -211,9 +215,9 @@ export default function Persons() {
             />
 
             {loading ? (
-                <Spinner />
+                <Spinner id="spinner-persons" />
             ) : (
-                <Table variant="simple" mt={4}>
+                <Table variant="simple" mt={4} id="table-persons">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -226,7 +230,7 @@ export default function Persons() {
                     </Thead>
                     <Tbody>
                         {filteredPersons.map((p) => (
-                            <Tr key={p.id}>
+                            <Tr key={p.id} id={`row-person-${p.id}`}>
                                 <Td>{p.id}</Td>
                                 <Td>{p.cpf}</Td>
                                 <Td>{p.name}</Td>
@@ -239,6 +243,7 @@ export default function Persons() {
                                 <Td textAlign="center">
                                     <Flex justify="center" gap={2}>
                                         <IconButton
+                                            id={`btn-edit-person-${p.id}`}
                                             aria-label="Editar"
                                             colorScheme="blue"
                                             size="sm"
@@ -246,6 +251,7 @@ export default function Persons() {
                                             onClick={() => handleOpenModal(p)}
                                         />
                                         <IconButton
+                                            id={`btn-delete-person-${p.id}`}
                                             aria-label="Excluir"
                                             colorScheme="red"
                                             size="sm"
@@ -262,14 +268,15 @@ export default function Persons() {
 
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
+                <ModalContent id="modal-person">
+                    <ModalHeader id="modal-person-header">
                         {editingPerson ? "Editar Pessoa" : "Nova Pessoa"}
                     </ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton id="btn-close-person" />
                     <ModalBody>
                         <RequiredLabel>CPF</RequiredLabel>
                         <Input
+                            id="input-person-cpf"
                             placeholder="000.000.000-00"
                             value={cpf}
                             onChange={(e) => setCpf(formatCPF(e.target.value))}
@@ -279,6 +286,7 @@ export default function Persons() {
 
                         <RequiredLabel>Nome</RequiredLabel>
                         <Input
+                            id="input-person-name"
                             placeholder="Nome completo"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -288,6 +296,7 @@ export default function Persons() {
 
                         <FormLabel>Email</FormLabel>
                         <Input
+                            id="input-person-email"
                             type="email"
                             placeholder="exemplo@email.com"
                             value={email}
@@ -298,6 +307,7 @@ export default function Persons() {
 
                         <RequiredLabel>Usuário</RequiredLabel>
                         <Input
+                            id="input-person-user"
                             value={user ? `${user.id} - ${user.name}` : ""}
                             isReadOnly
                             bg="gray.100"
@@ -307,10 +317,20 @@ export default function Persons() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onClose}>
+                        <Button
+                            id="btn-cancel-person"
+                            variant="ghost"
+                            mr={3}
+                            onClick={onClose}
+                        >
                             Cancelar
                         </Button>
-                        <Button colorScheme="teal" onClick={handleSave} isLoading={saving}>
+                        <Button
+                            id="btn-save-person"
+                            colorScheme="teal"
+                            onClick={handleSave}
+                            isLoading={saving}
+                        >
                             Salvar
                         </Button>
                     </ModalFooter>
@@ -318,4 +338,5 @@ export default function Persons() {
             </Modal>
         </Box>
     )
+
 }

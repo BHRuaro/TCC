@@ -1,11 +1,13 @@
-import { Flex, Box, chakra, VStack, useToast, Button } from "@chakra-ui/react"
+import { Flex, Box, chakra, VStack, useToast, Button, Text } from "@chakra-ui/react"
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
 import logo from "../assets/logo.png"
 
 export default function Layout() {
+    const navigate = useNavigate()
+    const toast = useToast()
 
-    const navigate = useNavigate();
-    const toast = useToast();
+    const storedUser = localStorage.getItem("user")
+    const user = storedUser ? JSON.parse(storedUser) : null
 
     const handleLogout = () => {
         localStorage.removeItem("token")
@@ -19,7 +21,7 @@ export default function Layout() {
             isClosable: true,
         })
 
-        navigate("/login");
+        navigate("/login")
     }
 
     return (
@@ -44,6 +46,14 @@ export default function Layout() {
                     <Box fontSize="2xl" fontWeight="bold" letterSpacing="wide">
                         Sistema de Estoque
                     </Box>
+                </Flex>
+
+                <Flex align="center" gap={4}>
+                    {user && (
+                        <Text fontWeight="medium" fontSize="lg">
+                            Olá, {user.name}
+                        </Text>
+                    )}
                 </Flex>
             </Flex>
 

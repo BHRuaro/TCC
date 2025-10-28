@@ -240,10 +240,10 @@ export default function Movements() {
     return (
         <Box>
             <Flex justify="space-between" align="center" mb={6}>
-                <Heading size="lg" color="teal.600">
+                <Heading size="lg" color="teal.600" id="heading-movements">
                     Movimentações de Estoque
                 </Heading>
-                <Button colorScheme="teal" onClick={onOpen}>
+                <Button id="btn-new-movement" colorScheme="teal" onClick={onOpen}>
                     Nova Movimentação
                 </Button>
             </Flex>
@@ -263,9 +263,9 @@ export default function Movements() {
             />
 
             {loading ? (
-                <Spinner />
+                <Spinner id="spinner-movements" />
             ) : (
-                <Table variant="simple" mt={4}>
+                <Table variant="simple" mt={4} id="table-movements">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -281,7 +281,7 @@ export default function Movements() {
                     </Thead>
                     <Tbody>
                         {filteredMovements.map((m) => (
-                            <Tr key={m.id}>
+                            <Tr key={m.id} id={`row-movement-${m.id}`}>
                                 <Td>{m.id}</Td>
                                 <Td>{m.type}</Td>
                                 <Td>{new Date(m.dateTime).toLocaleString()}</Td>
@@ -292,6 +292,7 @@ export default function Movements() {
                                 <Td>{m.observation || "-"}</Td>
                                 <Td textAlign="center">
                                     <IconButton
+                                        id={`btn-view-movement-${m.id}`}
                                         aria-label="Ver detalhes"
                                         icon={<ViewIcon />}
                                         colorScheme="teal"
@@ -305,11 +306,14 @@ export default function Movements() {
                 </Table>
             )}
 
+            {/* MODAL DE DETALHES */}
             <Modal isOpen={isDetailOpen} onClose={onDetailClose} isCentered size="lg">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Detalhes da Movimentação</ModalHeader>
-                    <ModalCloseButton />
+                <ModalContent id="modal-movement-details">
+                    <ModalHeader id="modal-movement-details-header">
+                        Detalhes da Movimentação
+                    </ModalHeader>
+                    <ModalCloseButton id="btn-close-details" />
                     <ModalBody>
                         {selectedMovement ? (
                             <>
@@ -350,7 +354,8 @@ export default function Movements() {
                                         const item = items.find((i) => i.id === im.itemId)
                                         return (
                                             <ListItem key={im.id || im.itemId}>
-                                                {item ? item.name : `Item ${im.itemId}`} — <b>Quantidade:</b> {im.quantity}
+                                                {item ? item.name : `Item ${im.itemId}`} —{" "}
+                                                <b>Quantidade:</b> {im.quantity}
                                             </ListItem>
                                         )
                                     })}
@@ -361,23 +366,27 @@ export default function Movements() {
                         )}
                     </ModalBody>
                     <ModalFooter>
-                        <Button onClick={onDetailClose}>Fechar</Button>
+                        <Button id="btn-close-details-footer" onClick={onDetailClose}>
+                            Fechar
+                        </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
 
+            {/* MODAL DE NOVA MOVIMENTAÇÃO */}
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="5xl">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Nova Movimentação</ModalHeader>
-                    <ModalCloseButton />
+                <ModalContent id="modal-new-movement">
+                    <ModalHeader id="modal-new-movement-header">
+                        Nova Movimentação
+                    </ModalHeader>
+                    <ModalCloseButton id="btn-close-new-movement" />
                     <ModalBody>
                         <SimpleGrid columns={2} spacing={4}>
                             <Box>
-                                <RequiredLabel>
-                                    Tipo de Movimentação
-                                </RequiredLabel>
+                                <RequiredLabel>Tipo de Movimentação</RequiredLabel>
                                 <Select
+                                    id="select-movement-type"
                                     placeholder="Selecione"
                                     value={movementType}
                                     onChange={(e) =>
@@ -391,10 +400,9 @@ export default function Movements() {
 
                             {movementType === "ENTRADA" && (
                                 <Box>
-                                    <RequiredLabel>
-                                        Fornecedor
-                                    </RequiredLabel>
+                                    <RequiredLabel>Fornecedor</RequiredLabel>
                                     <Select
+                                        id="select-supplier"
                                         placeholder="Selecione o fornecedor"
                                         value={supplierId}
                                         onChange={(e) => setSupplierId(Number(e.target.value))}
@@ -410,10 +418,9 @@ export default function Movements() {
 
                             {movementType === "SAIDA" && (
                                 <Box>
-                                    <RequiredLabel>
-                                        Pessoa
-                                    </RequiredLabel>
+                                    <RequiredLabel>Pessoa</RequiredLabel>
                                     <Select
+                                        id="select-person"
                                         placeholder="Selecione a pessoa"
                                         value={personId}
                                         onChange={(e) => setPersonId(Number(e.target.value))}
@@ -428,10 +435,9 @@ export default function Movements() {
                             )}
 
                             <Box>
-                                <RequiredLabel>
-                                    Usuário
-                                </RequiredLabel>
+                                <RequiredLabel>Usuário</RequiredLabel>
                                 <Input
+                                    id="input-movement-user"
                                     value={user ? `${user.id} - ${user.name}` : ""}
                                     isReadOnly
                                     bg="gray.100"
@@ -443,6 +449,7 @@ export default function Movements() {
                             <Box gridColumn="1 / span 2">
                                 <FormLabel>Observação</FormLabel>
                                 <Textarea
+                                    id="input-movement-observation"
                                     value={observation}
                                     onChange={(e) => setObservation(e.target.value)}
                                     placeholder="Ex: entrada de novos produtos..."
@@ -456,9 +463,11 @@ export default function Movements() {
                                 *
                             </Text>
                         </Heading>
+
                         {itemMovements.map((im, index) => (
-                            <Flex key={index} gap={3} mb={3}>
+                            <Flex key={index} gap={3} mb={3} id={`row-item-${index}`}>
                                 <Select
+                                    id={`select-item-${index}`}
                                     flex="2"
                                     placeholder="Selecione o item"
                                     value={im.itemId}
@@ -475,6 +484,7 @@ export default function Movements() {
                                     ))}
                                 </Select>
                                 <Input
+                                    id={`input-quantity-${index}`}
                                     flex="1"
                                     type="number"
                                     min={1}
@@ -489,6 +499,7 @@ export default function Movements() {
                                 />
                                 {itemMovements.length > 1 && (
                                     <Button
+                                        id={`btn-remove-item-${index}`}
                                         size="sm"
                                         colorScheme="red"
                                         variant="outline"
@@ -499,7 +510,9 @@ export default function Movements() {
                                 )}
                             </Flex>
                         ))}
+
                         <Button
+                            id="btn-add-item"
                             leftIcon={<AddIcon />}
                             size="sm"
                             colorScheme="teal"
@@ -511,10 +524,15 @@ export default function Movements() {
                     </ModalBody>
 
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onClose}>
+                        <Button id="btn-cancel-movement" variant="ghost" mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
-                        <Button colorScheme="teal" onClick={handleSave} isLoading={saving}>
+                        <Button
+                            id="btn-save-movement"
+                            colorScheme="teal"
+                            onClick={handleSave}
+                            isLoading={saving}
+                        >
                             Salvar
                         </Button>
                     </ModalFooter>

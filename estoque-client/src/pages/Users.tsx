@@ -224,7 +224,7 @@ export default function Users() {
                     Usuários
                 </Heading>
                 <Tooltip label="Somente administradores podem criar usuários" isDisabled={isAdmin}>
-                    <Button colorScheme="teal" onClick={() => handleOpenEdit()} isDisabled={!isAdmin}>
+                    <Button colorScheme="teal" onClick={() => handleOpenEdit()} isDisabled={!isAdmin} id="button-add-user">
                         Adicionar
                     </Button>
                 </Tooltip>
@@ -263,7 +263,7 @@ export default function Users() {
                             const tooltipDisabled = !buttonDisabled
 
                             return (
-                                <Tr key={u.id}>
+                                <Tr key={u.id} id={`row-user-${u.id}`}>
                                     <Td>{u.id}</Td>
                                     <Td>{u.name}</Td>
                                     <Td>{u.username}</Td>
@@ -273,6 +273,7 @@ export default function Users() {
                                         <Flex justify="center" gap={2}>
                                             <Tooltip label="Somente administradores podem editar" isDisabled={isAdmin}>
                                                 <IconButton
+                                                    id={`btn-edit-user-${u.id}`}
                                                     aria-label="Editar"
                                                     colorScheme="blue"
                                                     size="sm"
@@ -293,6 +294,7 @@ export default function Users() {
                                                 isDisabled={tooltipDisabled}
                                             >
                                                 <IconButton
+                                                    id={`btn-password-user-${u.id}`}
                                                     aria-label="Trocar senha"
                                                     colorScheme="yellow"
                                                     size="sm"
@@ -304,6 +306,7 @@ export default function Users() {
 
                                             <Tooltip label="Somente administradores podem excluir" isDisabled={isAdmin}>
                                                 <IconButton
+                                                    id={`btn-delete-user-${u.id}`}
                                                     aria-label="Excluir"
                                                     colorScheme="red"
                                                     size="sm"
@@ -319,21 +322,22 @@ export default function Users() {
                         })}
                     </Tbody>
                 </Table>
-
             )}
 
+            {/* MODAL DE EDIÇÃO */}
             <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered size="lg">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
+                <ModalContent id="modal-edit-user">
+                    <ModalHeader id="modal-edit-user-header">
                         {editingUser ? "Editar Usuário" : "Adicionar Usuário"}
                     </ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton id="btn-close-edit-user" />
                     <ModalBody>
                         <SimpleGrid columns={2} spacing={4}>
                             <Box>
                                 <RequiredLabel>Nome</RequiredLabel>
                                 <Input
+                                    id="input-name"
                                     placeholder="Digite o nome"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
@@ -342,6 +346,7 @@ export default function Users() {
                             <Box>
                                 <RequiredLabel>Usuário</RequiredLabel>
                                 <Input
+                                    id="input-username"
                                     placeholder="Nome de acesso"
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
@@ -351,6 +356,7 @@ export default function Users() {
                                 <Box>
                                     <RequiredLabel>Senha</RequiredLabel>
                                     <Input
+                                        id="input-password"
                                         type="password"
                                         placeholder="Digite a senha"
                                         value={password}
@@ -361,6 +367,7 @@ export default function Users() {
                             <Box>
                                 <RequiredLabel>Função</RequiredLabel>
                                 <Select
+                                    id="select-role"
                                     value={role}
                                     onChange={(e) => setRole(e.target.value)}
                                 >
@@ -371,6 +378,7 @@ export default function Users() {
                             <Box>
                                 <FormLabel>Ativo</FormLabel>
                                 <Switch
+                                    id="switch-active"
                                     isChecked={active}
                                     onChange={(e) => setActive(e.target.checked)}
                                 />
@@ -378,10 +386,11 @@ export default function Users() {
                         </SimpleGrid>
                     </ModalBody>
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onEditClose}>
+                        <Button id="btn-cancel-edit-user" variant="ghost" mr={3} onClick={onEditClose}>
                             Cancelar
                         </Button>
                         <Button
+                            id="btn-save-user"
                             colorScheme="teal"
                             onClick={handleSave}
                             isLoading={saving}
@@ -392,14 +401,16 @@ export default function Users() {
                 </ModalContent>
             </Modal>
 
+            {/* MODAL DE SENHA */}
             <Modal isOpen={isPasswordOpen} onClose={onPasswordClose} isCentered size="md">
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>Alterar Senha</ModalHeader>
-                    <ModalCloseButton />
+                <ModalContent id="modal-password-user">
+                    <ModalHeader id="modal-password-user-header">Alterar Senha</ModalHeader>
+                    <ModalCloseButton id="btn-close-password-user" />
                     <ModalBody>
                         <FormLabel>Nova Senha</FormLabel>
                         <Input
+                            id="input-new-password"
                             type="password"
                             placeholder="Digite a nova senha"
                             value={newPassword}
@@ -407,16 +418,20 @@ export default function Users() {
                         />
                     </ModalBody>
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onPasswordClose}>
+                        <Button id="btn-cancel-password-user" variant="ghost" mr={3} onClick={onPasswordClose}>
                             Cancelar
                         </Button>
-                        <Button colorScheme="teal" onClick={handleChangePassword} isLoading={saving}>
+                        <Button
+                            id="btn-confirm-password-user"
+                            colorScheme="teal"
+                            onClick={handleChangePassword}
+                            isLoading={saving}
+                        >
                             Alterar
                         </Button>
                     </ModalFooter>
                 </ModalContent>
             </Modal>
-
         </Box>
     )
 }

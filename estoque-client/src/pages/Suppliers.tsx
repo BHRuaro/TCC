@@ -197,7 +197,7 @@ export default function Suppliers() {
     return (
         <Box>
             <Flex justify="space-between" align="center" mb={6}>
-                <Heading size="lg" color="teal.600">
+                <Heading size="lg" color="teal.600" id="heading-suppliers">
                     Fornecedores
                 </Heading>
 
@@ -206,6 +206,7 @@ export default function Suppliers() {
                     isDisabled={isAdmin}
                 >
                     <Button
+                        id="btn-add-supplier"
                         colorScheme="teal"
                         onClick={() => handleOpenModal()}
                         isDisabled={!isAdmin}
@@ -227,9 +228,9 @@ export default function Suppliers() {
             />
 
             {loading ? (
-                <Spinner />
+                <Spinner id="spinner-suppliers" />
             ) : (
-                <Table variant="simple" mt={4}>
+                <Table variant="simple" mt={4} id="table-suppliers">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -241,7 +242,7 @@ export default function Suppliers() {
                     </Thead>
                     <Tbody>
                         {filteredSuppliers.map((supplier) => (
-                            <Tr key={supplier.id}>
+                            <Tr key={supplier.id} id={`row-supplier-${supplier.id}`}>
                                 <Td>{supplier.id}</Td>
                                 <Td>{supplier.name}</Td>
                                 <Td>{supplier.cnpj}</Td>
@@ -257,6 +258,7 @@ export default function Suppliers() {
                                             isDisabled={isAdmin}
                                         >
                                             <IconButton
+                                                id={`btn-edit-supplier-${supplier.id}`}
                                                 aria-label="Editar"
                                                 colorScheme="blue"
                                                 size="sm"
@@ -270,6 +272,7 @@ export default function Suppliers() {
                                             isDisabled={isAdmin}
                                         >
                                             <IconButton
+                                                id={`btn-delete-supplier-${supplier.id}`}
                                                 aria-label="Excluir"
                                                 colorScheme="red"
                                                 size="sm"
@@ -288,14 +291,15 @@ export default function Suppliers() {
 
             <Modal isOpen={isOpen} onClose={onClose} isCentered>
                 <ModalOverlay />
-                <ModalContent>
-                    <ModalHeader>
+                <ModalContent id="modal-supplier">
+                    <ModalHeader id="modal-supplier-header">
                         {editingSupplier ? "Editar Fornecedor" : "Novo Fornecedor"}
                     </ModalHeader>
-                    <ModalCloseButton />
+                    <ModalCloseButton id="btn-close-supplier" />
                     <ModalBody>
                         <RequiredLabel>Nome</RequiredLabel>
                         <Input
+                            id="input-supplier-name"
                             placeholder="Nome do fornecedor"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
@@ -304,6 +308,7 @@ export default function Suppliers() {
                         />
                         <RequiredLabel>CNPJ</RequiredLabel>
                         <Input
+                            id="input-supplier-cnpj"
                             placeholder="00.000.000/0000-00"
                             value={cnpj}
                             onChange={(e) => setCnpj(formatCNPJ(e.target.value))}
@@ -313,6 +318,7 @@ export default function Suppliers() {
                         />
                         <RequiredLabel>Usuário</RequiredLabel>
                         <Input
+                            id="input-supplier-user"
                             value={user ? `${user.id} - ${user.name}` : ""}
                             isReadOnly
                             bg="gray.100"
@@ -321,7 +327,7 @@ export default function Suppliers() {
                         />
                     </ModalBody>
                     <ModalFooter>
-                        <Button variant="ghost" mr={3} onClick={onClose}>
+                        <Button id="btn-cancel-supplier" variant="ghost" mr={3} onClick={onClose}>
                             Cancelar
                         </Button>
                         <Tooltip
@@ -329,6 +335,7 @@ export default function Suppliers() {
                             isDisabled={isAdmin}
                         >
                             <Button
+                                id="btn-save-supplier"
                                 colorScheme="teal"
                                 onClick={handleSave}
                                 isLoading={saving}
