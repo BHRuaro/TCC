@@ -40,7 +40,10 @@ export default function Login() {
 
             localStorage.setItem("token", data.token)
             localStorage.setItem("role", data.role)
-            localStorage.setItem("name", data.name)
+            localStorage.setItem("user", JSON.stringify({
+                id: data.userId,
+                name: data.name
+            }))
 
             toast({ title: "Login realizado com sucesso!", status: "success" })
             setTimeout(() => navigate("/"), 800)

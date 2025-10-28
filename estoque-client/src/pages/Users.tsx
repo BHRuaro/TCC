@@ -39,8 +39,8 @@ import {
     changePassword,
     type User,
 } from "../services/UserService"
+import RequiredLabel from "../components/RequiredLabel"
 
-// Função para decodificar o campo "sub" (username) do JWT
 function decodeJwtSub(token?: string | null): string | null {
     try {
         if (!token) return null
@@ -71,7 +71,6 @@ export default function Users() {
     const { isOpen: isEditOpen, onOpen: onEditOpen, onClose: onEditClose } = useDisclosure()
     const { isOpen: isPasswordOpen, onOpen: onPasswordOpen, onClose: onPasswordClose } = useDisclosure()
 
-    // 🔹 pega info do logado
     const token = localStorage.getItem("token")
     const loggedUsername = useMemo(() => decodeJwtSub(token), [token])
     const roleStorage = localStorage.getItem("role")
@@ -240,6 +239,7 @@ export default function Users() {
                     { key: "role", label: "Função" },
                 ]}
                 onSearch={setFilteredUsers}
+                onReload={loadUsers}
             />
 
             {loading ? (
@@ -258,7 +258,9 @@ export default function Users() {
                     </Thead>
                     <Tbody>
                         {filteredUsers.map((u) => {
-                            const canChangeOwnPassword = u.username === loggedUsername || isAdmin
+                            const canChangeOwnPassword = u.username === loggedUsername
+                            const buttonDisabled = !isAdmin && !canChangeOwnPassword
+                            const tooltipDisabled = !buttonDisabled
 
                             return (
                                 <Tr key={u.id}>
@@ -282,11 +284,13 @@ export default function Users() {
 
                                             <Tooltip
                                                 label={
-                                                    canChangeOwnPassword
+                                                    isAdmin
                                                         ? "Alterar senha"
-                                                        : "Você só pode alterar a sua própria senha"
+                                                        : canChangeOwnPassword
+                                                            ? "Alterar sua senha"
+                                                            : "Você só pode alterar a sua própria senha"
                                                 }
-                                                isDisabled={canChangeOwnPassword}
+                                                isDisabled={tooltipDisabled}
                                             >
                                                 <IconButton
                                                     aria-label="Trocar senha"
@@ -294,7 +298,7 @@ export default function Users() {
                                                     size="sm"
                                                     icon={<FaKey />}
                                                     onClick={() => handleOpenPasswordModal(u.id!, u.username)}
-                                                    isDisabled={!canChangeOwnPassword}
+                                                    isDisabled={buttonDisabled}
                                                 />
                                             </Tooltip>
 
@@ -315,9 +319,79 @@ export default function Users() {
                         })}
                     </Tbody>
                 </Table>
+
             )}
 
-            {/* MODAL TROCA DE SENHA */}
+            <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered size="lg">
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>
+                        {editingUser ? "Editar Usuário" : "Adicionar Usuário"}
+                    </ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <SimpleGrid columns={2} spacing={4}>
+                            <Box>
+                                <RequiredLabel>Nome</RequiredLabel>
+                                <Input
+                                    placeholder="Digite o nome"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
+                            </Box>
+                            <Box>
+                                <RequiredLabel>Usuário</RequiredLabel>
+                                <Input
+                                    placeholder="Nome de acesso"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </Box>
+                            {!editingUser && (
+                                <Box>
+                                    <RequiredLabel>Senha</RequiredLabel>
+                                    <Input
+                                        type="password"
+                                        placeholder="Digite a senha"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                </Box>
+                            )}
+                            <Box>
+                                <RequiredLabel>Função</RequiredLabel>
+                                <Select
+                                    value={role}
+                                    onChange={(e) => setRole(e.target.value)}
+                                >
+                                    <option value="USER">Usuário</option>
+                                    <option value="ROLE_ADMIN">Administrador</option>
+                                </Select>
+                            </Box>
+                            <Box>
+                                <FormLabel>Ativo</FormLabel>
+                                <Switch
+                                    isChecked={active}
+                                    onChange={(e) => setActive(e.target.checked)}
+                                />
+                            </Box>
+                        </SimpleGrid>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button variant="ghost" mr={3} onClick={onEditClose}>
+                            Cancelar
+                        </Button>
+                        <Button
+                            colorScheme="teal"
+                            onClick={handleSave}
+                            isLoading={saving}
+                        >
+                            {editingUser ? "Salvar Alterações" : "Adicionar"}
+                        </Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+
             <Modal isOpen={isPasswordOpen} onClose={onPasswordClose} isCentered size="md">
                 <ModalOverlay />
                 <ModalContent>
@@ -342,6 +416,7 @@ export default function Users() {
                     </ModalFooter>
                 </ModalContent>
             </Modal>
+
         </Box>
     )
 }

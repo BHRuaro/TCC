@@ -33,11 +33,11 @@ import {
     deletePerson,
     type Person,
 } from "../services/PersonService"
+import RequiredLabel from "../components/RequiredLabel"
 
 interface LoggedUser {
     id: number
     name: string
-    username: string
 }
 
 export default function Persons() {
@@ -76,7 +76,6 @@ export default function Persons() {
     useEffect(() => {
         const storedUser = localStorage.getItem("user")
         if (storedUser) setUser(JSON.parse(storedUser))
-        else setUser({ id: 1, name: "Bruno Ruaro", username: "bruaro" })
     }, [])
 
     const loadPersons = async () => {
@@ -118,7 +117,7 @@ export default function Persons() {
     const handleSave = async () => {
         if (!cpf.trim() || !name.trim()) {
             toast({
-                title: "Preencha os campos obrigatórios (CPF e Nome)",
+                title: "Preencha os campos obrigatórios",
                 status: "warning",
             })
             return
@@ -208,6 +207,7 @@ export default function Persons() {
                     { key: "email", label: "Email" },
                 ]}
                 onSearch={setFilteredPersons}
+                onReload={loadPersons}
             />
 
             {loading ? (
@@ -231,7 +231,11 @@ export default function Persons() {
                                 <Td>{p.cpf}</Td>
                                 <Td>{p.name}</Td>
                                 <Td>{p.email || "-"}</Td>
-                                <Td>{user ? `${user.id} - ${user.name}` : "-"}</Td>
+                                <Td>
+                                    {p.userId
+                                        ? `${p.userId} - ${p.userName}`
+                                        : "-"}
+                                </Td>
                                 <Td textAlign="center">
                                     <Flex justify="center" gap={2}>
                                         <IconButton
@@ -264,7 +268,7 @@ export default function Persons() {
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <FormLabel>CPF</FormLabel>
+                        <RequiredLabel>CPF</RequiredLabel>
                         <Input
                             placeholder="000.000.000-00"
                             value={cpf}
@@ -273,7 +277,7 @@ export default function Persons() {
                             mb={3}
                         />
 
-                        <FormLabel>Nome</FormLabel>
+                        <RequiredLabel>Nome</RequiredLabel>
                         <Input
                             placeholder="Nome completo"
                             value={name}
@@ -292,7 +296,7 @@ export default function Persons() {
                             mb={3}
                         />
 
-                        <FormLabel>Usuário</FormLabel>
+                        <RequiredLabel>Usuário</RequiredLabel>
                         <Input
                             value={user ? `${user.id} - ${user.name}` : ""}
                             isReadOnly

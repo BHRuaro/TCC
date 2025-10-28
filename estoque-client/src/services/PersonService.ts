@@ -6,6 +6,7 @@ export interface Person {
     name: string
     email?: string
     userId?: number
+    userName?: string
 }
 
 export async function getAllPersons(): Promise<Person[]> {

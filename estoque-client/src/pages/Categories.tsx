@@ -33,6 +33,7 @@ import {
     updateCategory,
 } from "../services/CategoryService"
 import type { Category } from "../services/CategoryService"
+import RequiredLabel from "../components/RequiredLabel"
 
 export default function Categories() {
     const [categories, setCategories] = useState<Category[]>([])
@@ -225,8 +226,9 @@ export default function Categories() {
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
+                        <RequiredLabel>Descrição da categoria</RequiredLabel>
                         <Input
-                            placeholder="Descrição da categoria"
+                            placeholder="Ex: Equipamentos de escritório"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             isDisabled={!isAdmin}

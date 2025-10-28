@@ -5,6 +5,7 @@ export interface Supplier {
     name: string
     cnpj: string
     userId?: number
+    userName?: string
 }
 
 export async function getAllSuppliers(): Promise<Supplier[]> {

@@ -24,7 +24,11 @@ import {
     FormLabel,
     Select,
     SimpleGrid,
+    Tooltip,
+    Icon,
+    HStack
 } from "@chakra-ui/react"
+import { QuestionIcon } from "@chakra-ui/icons"
 import { useEffect, useState } from "react"
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons"
 import SearchBar from "../components/SearchBar"
@@ -37,11 +41,11 @@ import {
 } from "../services/ItemService"
 import { getAllCategories, type Category } from "../services/CategoryService"
 import { getAllSuppliers, type Supplier } from "../services/SupplierService"
+import RequiredLabel from "../components/RequiredLabel"
 
 interface LoggedUser {
     id: number
     name: string
-    username: string
 }
 
 export default function Items() {
@@ -69,7 +73,6 @@ export default function Items() {
     useEffect(() => {
         const storedUser = localStorage.getItem("user")
         if (storedUser) setUser(JSON.parse(storedUser))
-        else setUser({ id: 1, name: "Bruno Ruaro", username: "bruaro" })
     }, [])
 
     const loadData = async () => {
@@ -80,10 +83,16 @@ export default function Items() {
                 getAllCategories(),
                 getAllSuppliers(),
             ])
-            setItems(itemsData)
-            setFilteredItems(itemsData)
-            setCategories(categoriesData)
-            setSuppliers(suppliersData)
+
+            const sortedItems = [...itemsData].sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+            const sortedCategories = [...categoriesData].sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+            const sortedSuppliers = [...suppliersData].sort((a, b) => (a.id ?? 0) - (b.id ?? 0))
+
+
+            setItems(sortedItems)
+            setFilteredItems(sortedItems)
+            setCategories(sortedCategories)
+            setSuppliers(sortedSuppliers)
         } catch (err: any) {
             toast({
                 title: "Erro ao carregar dados",
@@ -222,6 +231,7 @@ export default function Items() {
                     { key: "supplierName", label: "Fornecedor" },
                 ]}
                 onSearch={setFilteredItems}
+                onReload={loadData}
             />
             {loading ? (
                 <Spinner />
@@ -257,7 +267,11 @@ export default function Items() {
                                     <Td>
                                         {supplier ? `${supplier.id} - ${supplier.name}` : "-"}
                                     </Td>
-                                    <Td>{user ? `${user.id} - ${user.name}` : "-"}</Td>
+                                    <Td>
+                                        {item.userId
+                                            ? `${item.userId} - ${item.userName}`
+                                            : "-"}
+                                    </Td>
                                     <Td textAlign="center">
                                         <Flex justify="center" gap={2}>
                                             <IconButton
@@ -293,7 +307,9 @@ export default function Items() {
                     <ModalBody>
                         <SimpleGrid columns={2} spacing={4}>
                             <Box>
-                                <FormLabel>Nome</FormLabel>
+                                <RequiredLabel>
+                                    Nome
+                                </RequiredLabel>
                                 <Input value={name} onChange={(e) => setName(e.target.value)} mb={3} />
                             </Box>
 
@@ -308,11 +324,7 @@ export default function Items() {
                                     type="number"
                                     min={0}
                                     value={unitPrice}
-                                    onChange={(e) => {
-                                        const value = Number(e.target.value)
-                                        if (value < 0) return toast({ title: "O valor não pode ser negativo", status: "warning" })
-                                        setUnitPrice(e.target.value ? value : "")
-                                    }}
+                                    onChange={(e) => setUnitPrice(e.target.value ? Number(e.target.value) : "")}
                                     mb={3}
                                 />
                             </Box>
@@ -323,52 +335,72 @@ export default function Items() {
                                     type="number"
                                     min={0}
                                     value={stockQuantity}
-                                    onChange={(e) => {
-                                        const value = Number(e.target.value)
-                                        if (value < 0) return toast({ title: "O valor não pode ser negativo", status: "warning" })
-                                        setStockQuantity(e.target.value ? value : "")
-                                    }}
+                                    onChange={(e) => setStockQuantity(e.target.value ? Number(e.target.value) : "")}
                                     mb={3}
                                 />
                             </Box>
 
                             <Box>
-                                <FormLabel>Estoque Mínimo</FormLabel>
+                                <HStack spacing={1}>
+                                    <FormLabel mb={0}>Estoque Mínimo</FormLabel>
+                                    <Tooltip
+                                        label="Ao atingir o estoque mínimo, o sistema irá alertá-lo sobre a necessidade de reposição deste item. Deixe em branco para não aplicar um estoque mínimo."
+                                        hasArrow
+                                        placement="top"
+                                    >
+                                        <Icon as={QuestionIcon} color="teal.500" cursor="pointer" boxSize={4} />
+                                    </Tooltip>
+                                </HStack>
                                 <Input
                                     type="number"
                                     min={0}
                                     value={minStockQuantity}
-                                    onChange={(e) => {
-                                        const value = Number(e.target.value)
-                                        if (value < 0) return toast({ title: "O valor não pode ser negativo", status: "warning" })
-                                        setMinStockQuantity(e.target.value ? value : "")
-                                    }}
+                                    onChange={(e) => setMinStockQuantity(e.target.value ? Number(e.target.value) : "")}
                                     mb={3}
                                 />
                             </Box>
 
                             <Box>
-                                <FormLabel>Limite de Movimentação</FormLabel>
+                                <HStack spacing={1}>
+                                    <FormLabel mb={0}>Limite de Movimentação</FormLabel>
+                                    <Tooltip
+                                        label="O limite de movimentação define a quantidade máxima de saídas permitidas para este item por movimentação. Deixe em branco para não aplicar um limite."
+                                        hasArrow
+                                        placement="top"
+                                    >
+                                        <Icon as={QuestionIcon} color="teal.500" cursor="pointer" boxSize={4} />
+                                    </Tooltip>
+                                </HStack>
                                 <Input
                                     type="number"
                                     min={0}
                                     value={movementLimit}
-                                    onChange={(e) => {
-                                        const value = Number(e.target.value)
-                                        if (value < 0) return toast({ title: "O valor não pode ser negativo", status: "warning" })
-                                        setMovementLimit(e.target.value ? value : "")
-                                    }}
+                                    onChange={(e) => setMovementLimit(e.target.value ? Number(e.target.value) : "")}
                                     mb={3}
                                 />
                             </Box>
 
                             <Box>
-                                <FormLabel>Data de Validade</FormLabel>
-                                <Input type="date" value={expirationDate} onChange={(e) => setExpirationDate(e.target.value)} mb={3} />
+                                <HStack spacing={1}>
+                                    <FormLabel mb={0}>Data de Validade</FormLabel>
+                                    <Tooltip
+                                        label="Ao atingir a data de validade, o sistema irá alertá-lo sobre a necessidade de reposição deste item. Deixe em branco se o item não tiver validade."
+                                        hasArrow
+                                        placement="top"
+                                    >
+                                        <Icon as={QuestionIcon} color="teal.500" cursor="pointer" boxSize={4} />
+                                    </Tooltip>
+                                </HStack>
+                                <Input
+                                    type="date"
+                                    value={expirationDate}
+                                    onChange={(e) => setExpirationDate(e.target.value)}
+                                    mb={3}
+                                />
                             </Box>
 
                             <Box>
-                                <FormLabel>Categoria</FormLabel>
+                                <RequiredLabel>Categoria</RequiredLabel>
                                 <Select placeholder="Selecione a categoria" value={categoryId} onChange={(e) => setCategoryId(Number(e.target.value))} mb={3}>
                                     {categories.map((c) => (
                                         <option key={c.id} value={c.id}>
@@ -379,7 +411,7 @@ export default function Items() {
                             </Box>
 
                             <Box>
-                                <FormLabel>Fornecedor</FormLabel>
+                                <RequiredLabel>Fornecedor</RequiredLabel>
                                 <Select placeholder="Selecione o fornecedor" value={supplierId} onChange={(e) => setSupplierId(Number(e.target.value))} mb={3}>
                                     {suppliers.map((s) => (
                                         <option key={s.id} value={s.id}>

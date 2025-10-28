@@ -22,7 +22,6 @@ import {
     ModalBody,
     ModalCloseButton,
     Input,
-    FormLabel,
     Tooltip,
 } from "@chakra-ui/react"
 import { useEffect, useState } from "react"
@@ -34,11 +33,11 @@ import {
     updateSupplier,
 } from "../services/SupplierService"
 import type { Supplier } from "../services/SupplierService"
+import RequiredLabel from "../components/RequiredLabel"
 
 interface LoggedUser {
     id: number
     name: string
-    username: string
 }
 
 export default function Suppliers() {
@@ -53,7 +52,6 @@ export default function Suppliers() {
     const toast = useToast()
     const { isOpen, onOpen, onClose } = useDisclosure()
 
-    // 🔹 Recupera a role do localStorage
     const role = localStorage.getItem("role")
     const isAdmin = role === "ROLE_ADMIN"
 
@@ -61,8 +59,6 @@ export default function Suppliers() {
         const storedUser = localStorage.getItem("user")
         if (storedUser) {
             setUser(JSON.parse(storedUser))
-        } else {
-            setUser({ id: 1, name: "Bruno Ruaro", username: "bruaro" })
         }
     }, [])
 
@@ -124,7 +120,7 @@ export default function Suppliers() {
     const handleSave = async () => {
         if (!name.trim() || !cnpj.trim()) {
             toast({
-                title: "Preencha todos os campos",
+                title: "Preencha os campos obrigatórios",
                 status: "warning",
             })
             return
@@ -227,6 +223,7 @@ export default function Suppliers() {
                     { key: "cnpj", label: "CNPJ" },
                 ]}
                 onSearch={setFilteredSuppliers}
+                onReload={loadSuppliers}
             />
 
             {loading ? (
@@ -249,11 +246,9 @@ export default function Suppliers() {
                                 <Td>{supplier.name}</Td>
                                 <Td>{supplier.cnpj}</Td>
                                 <Td>
-                                    {supplier.userId && user && supplier.userId === user.id
-                                        ? `${supplier.userId} - ${user.name}`
-                                        : supplier.userId
-                                            ? `${supplier.userId} - (Outro Usuário)`
-                                            : "-"}
+                                    {supplier.userId
+                                        ? `${supplier.userId} - ${supplier.userName}`
+                                        : "-"}
                                 </Td>
                                 <Td textAlign="center">
                                     <Flex justify="center" gap={2}>
@@ -299,7 +294,7 @@ export default function Suppliers() {
                     </ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <FormLabel>Nome</FormLabel>
+                        <RequiredLabel>Nome</RequiredLabel>
                         <Input
                             placeholder="Nome do fornecedor"
                             value={name}
@@ -307,7 +302,7 @@ export default function Suppliers() {
                             mb={3}
                             isDisabled={!isAdmin}
                         />
-                        <FormLabel>CNPJ</FormLabel>
+                        <RequiredLabel>CNPJ</RequiredLabel>
                         <Input
                             placeholder="00.000.000/0000-00"
                             value={cnpj}
@@ -316,7 +311,7 @@ export default function Suppliers() {
                             mb={3}
                             isDisabled={!isAdmin}
                         />
-                        <FormLabel>Usuário</FormLabel>
+                        <RequiredLabel>Usuário</RequiredLabel>
                         <Input
                             value={user ? `${user.id} - ${user.name}` : ""}
                             isReadOnly

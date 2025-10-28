@@ -12,6 +12,7 @@ export interface Item {
     categoryId: number
     supplierId: number
     userId?: number
+    userName?: string
 }
 
 export async function getAllItems(): Promise<Item[]> {
