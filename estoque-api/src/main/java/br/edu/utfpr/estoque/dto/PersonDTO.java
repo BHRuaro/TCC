@@ -17,4 +17,5 @@ public class PersonDTO implements Identifiable<Long> {
     private String cpf;
     private String email;
     private Long userId;
+    private String userName;
 }

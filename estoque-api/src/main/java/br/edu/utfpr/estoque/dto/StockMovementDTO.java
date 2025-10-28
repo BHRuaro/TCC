@@ -18,6 +18,7 @@ public class StockMovementDTO implements Identifiable<Long> {
 
         private Long id;
         private Long userId;
+        private String userName;
         private Long personId;
         private LocalDateTime dateTime;
         private MovementType type;

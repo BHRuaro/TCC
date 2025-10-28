@@ -1,6 +1,8 @@
 package br.edu.utfpr.estoque.controller;
 
 import br.edu.utfpr.estoque.dto.StockMovementDTO;
+import br.edu.utfpr.estoque.dto.StockMovementResponse;
+import br.edu.utfpr.estoque.dto.StockMovementResponseDTO;
 import br.edu.utfpr.estoque.exceptionHandler.OperationNotAllowedException;
 import br.edu.utfpr.estoque.model.StockMovement;
 import br.edu.utfpr.estoque.service.StockMovementService;
@@ -21,13 +23,21 @@ public class StockMovementController extends CrudController<StockMovement, Stock
         this.stockMovementService = stockMovementService;
     }
 
-    @Override
-    @PostMapping
-    public ResponseEntity<StockMovementDTO> create(@RequestBody StockMovementDTO dto) {
+    @PostMapping("/create")
+    public ResponseEntity<StockMovementResponseDTO> createWithWarning(@RequestBody StockMovementDTO dto) {
         StockMovement entity = stockMovementService.getDtoMapper().toEntity(dto, StockMovement.class);
-        StockMovement saved = stockMovementService.saveEntity(entity);
-        StockMovementDTO savedDto = stockMovementService.getDtoMapper().toDto(saved, StockMovementDTO.class);
-        return ResponseEntity.ok(savedDto);
+
+        StockMovementResponse response = stockMovementService.saveEntityWithWarning(entity);
+
+        StockMovementDTO savedDto = stockMovementService.getDtoMapper()
+                .toDto(response.getMovement(), StockMovementDTO.class);
+
+        StockMovementResponseDTO responseDto = StockMovementResponseDTO.builder()
+                .movement(savedDto)
+                .warnings(response.getWarnings())
+                .build();
+
+        return ResponseEntity.ok(responseDto);
     }
 
 

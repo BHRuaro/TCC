@@ -14,4 +14,5 @@ public class AuthResponse {
     private long expiresIn;
     private String role;
     private String name;
+    private Long userId;
 }

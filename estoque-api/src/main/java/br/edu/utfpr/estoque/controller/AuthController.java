@@ -44,10 +44,21 @@ public class AuthController {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
+        if (!user.getActive()) {
+            throw new IllegalArgumentException("Usuário inativo. Contate o administrador.");
+        }
+
         String token = jwtService.generateToken(user);
         long expiresIn = jwtService.getJwtExpirationMs() / 1000;
 
-        AuthResponse response = new AuthResponse(token, expiresIn, user.getRole(), user.getName());
+        AuthResponse response = new AuthResponse(
+                token,
+                expiresIn,
+                user.getRole(),
+                user.getName(),
+                user.getId()
+        );
+
         return ResponseEntity.ok(response);
     }
 

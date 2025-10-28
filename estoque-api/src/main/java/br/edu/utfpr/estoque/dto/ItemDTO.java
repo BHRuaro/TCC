@@ -28,4 +28,5 @@ public class ItemDTO implements Identifiable<Long> {
     private Long categoryId;
     private Long supplierId;
     private Long userId;
+    private String userName;
 }
