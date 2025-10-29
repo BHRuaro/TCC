@@ -8,9 +8,13 @@ export default defineConfig({
     baseUrl: "http://localhost:5173",
     env: {
       token: "",
+      allure: true,
+      allureResultsPath: "allure-results",
+      allureReuseAfterSpec: true,
     },
     setupNodeEvents(on, config) {
       allureWriter(on, config)
+
       on("task", {
         async queryDatabase(query: string) {
           const client = new Client({
@@ -28,14 +32,11 @@ export default defineConfig({
         },
         resetDatabase() {
           return resetDatabase()
-        }
+        },
       })
 
       return config
     },
-  },
-  env: {
-    allureReuseAfterSpec: true,
   },
   viewportHeight: 1080,
   viewportWidth: 1920,

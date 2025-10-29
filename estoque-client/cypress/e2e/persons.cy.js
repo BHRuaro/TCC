@@ -92,7 +92,7 @@ describe('Pessoas', () => {
         })
     })
 
-    it.only('Deve realizar a busca de pessoas por Nome, CNPJ e Email', () => {
+    it('Deve realizar a busca de pessoas por Nome, CNPJ e Email', () => {
         cy.login('cypress-user', 'user').then(() => {
             const persons = [
                 { cpf: '123.456.789-00', name: 'Alice Silva', email: 'alice@exemplo.com' },

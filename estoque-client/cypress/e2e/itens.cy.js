@@ -136,7 +136,7 @@ describe('Itens', () => {
         })
     })
 
-    it.only('Deve buscar itens pelo nome, descrição, categoria e fornecedor', () => {
+    it('Deve buscar itens pelo nome, descrição, categoria e fornecedor', () => {
         cy.task('queryDatabase', 'INSERT INTO CATEGORY (id, description) VALUES (1, \'Categoria A\'), (2, \'Categoria B\')')
         cy.task('queryDatabase', 'INSERT INTO supplier (id, user_id, "name", cnpj) VALUES(1, 1, \'Fornecedor X\', \'99.999.999/9999-99\'), (2, 1, \'Fornecedor Y\', \'88.888.888/8888-88\')')
         const items = [

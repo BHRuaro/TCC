@@ -140,11 +140,10 @@ describe('Fornecedores', () => {
     context('User - Fornecedores', () => {
 
         beforeEach(() => {
-            cy.task('queryDatabase', 'DELETE FROM ITEM')
-            cy.task('queryDatabase', 'DELETE FROM SUPPLIER')
+            cy.resetDatabase()
         })
 
-        it.only('Deve visualizar a lista de fornecedores e verificar os campos bloqueados', () => {
+        it('Deve visualizar a lista de fornecedores e verificar os campos bloqueados', () => {
             var id
             cy.login('cypress-admin', 'admin').then(() => {
                 cy.request({

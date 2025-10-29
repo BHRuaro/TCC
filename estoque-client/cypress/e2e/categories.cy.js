@@ -99,10 +99,10 @@ describe('Categorias', () => {
 
     context('User - Categorias', () => {
         beforeEach(() => {
-            cy.task('queryDatabase', 'DELETE FROM CATEGORY')
+            cy.resetDatabase()
         })
 
-        it.only('Deve visualizar a lista de categorias e verificar os campos bloqueados', () => {
+        it('Deve visualizar a lista de categorias e verificar os campos bloqueados', () => {
             var id
             cy.login('cypress-admin', 'admin').then(() => {
                 cy.request({

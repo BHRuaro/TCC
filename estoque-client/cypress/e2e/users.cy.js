@@ -13,7 +13,7 @@ describe('Usuarios', () => {
             cy.get('#input-name').type('Teste User');
             cy.get('#input-username').type('Teste User');
             cy.get('#input-password').type('userpass');
-            cy.get('#select-role').select('USER');
+            cy.get('#select-role').select('ROLE_USER');
             cy.get('#btn-save-user').click();
             cy.get('#toast-1-title').should('contain', 'Usuário criado com sucesso!');
             cy.get('#table-users').should('contain', 'Teste User');
@@ -28,7 +28,7 @@ describe('Usuarios', () => {
                     body: {
                         name: "Teste User",
                         username: "Teste User",
-                        role: "USER",
+                        role: "ROLE_USER",
                         password: "userpass",
                         active: true
                     },
@@ -61,7 +61,7 @@ describe('Usuarios', () => {
                     body: {
                         name: "Teste User",
                         username: "Teste User",
-                        role: "USER",
+                        role: "ROLE_USER",
                         password: "userpass",
                         active: true
                     },
@@ -85,8 +85,8 @@ describe('Usuarios', () => {
         it('Deve permitir busca por Usuário, nome e função', () => {
 
             const users = [
-                { name: "Teste User", username: "Teste Username", role: "USER", password: "userpass" },
-                { name: "Admin User", username: "Admin Username", role: "ADMIN", password: "adminpass" }
+                { name: "Teste User", username: "Teste Username", role: "ROLE_USER", password: "userpass" },
+                { name: "Admin User", username: "Admin Username", role: "ROLE_ADMIN", password: "adminpass" }
             ];
 
             cy.login('cypress-admin', 'admin').then(() => {
@@ -158,7 +158,7 @@ describe('Usuarios', () => {
                     body: {
                         name: "Teste User",
                         username: "testeuser",
-                        role: "USER",
+                        role: "ROLE_USER",
                         password: "userpass",
                         active: true
                     },
@@ -200,7 +200,8 @@ describe('Usuarios', () => {
             cy.get('#btn-password-user-1').should('be.disabled')
         })
 
-        it.only('⦁	Deve verificar que é possível editar a própria senha', () => {
+        it('Deve verificar que é possível editar a própria senha', () => {
+            cy.task('queryDatabase', 'SELECT setval(\'app_user_id_seq\', (SELECT MAX(id) FROM "app_user") + 1);')
             var id
             cy.login('cypress-admin', 'admin').then(() => {
                 cy.request({

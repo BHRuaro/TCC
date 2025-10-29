@@ -318,7 +318,6 @@ export default function Movements() {
                 </Table>
             )}
 
-            {/* MODAL DE DETALHES */}
             <Modal isOpen={isDetailOpen} onClose={onDetailClose} isCentered size="lg">
                 <ModalOverlay />
                 <ModalContent id="modal-movement-details">
@@ -326,7 +325,7 @@ export default function Movements() {
                         Detalhes da Movimentação
                     </ModalHeader>
                     <ModalCloseButton id="btn-close-details" />
-                    <ModalBody>
+                    <ModalBody id="modal-body-movements-details">
                         {selectedMovement ? (
                             <>
                                 <Text>
@@ -385,7 +384,6 @@ export default function Movements() {
                 </ModalContent>
             </Modal>
 
-            {/* MODAL DE NOVA MOVIMENTAÇÃO */}
             <Modal isOpen={isOpen} onClose={onClose} isCentered size="5xl">
                 <ModalOverlay />
                 <ModalContent id="modal-new-movement">

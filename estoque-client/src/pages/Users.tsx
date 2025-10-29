@@ -370,7 +370,7 @@ export default function Users() {
                                     value={role}
                                     onChange={(e) => setRole(e.target.value)}
                                 >
-                                    <option value="USER">Usuário</option>
+                                    <option value="ROLE_USER">Usuário</option>
                                     <option value="ROLE_ADMIN">Administrador</option>
                                 </Select>
                             </Box>
@@ -400,7 +400,6 @@ export default function Users() {
                 </ModalContent>
             </Modal>
 
-            {/* MODAL DE SENHA */}
             <Modal isOpen={isPasswordOpen} onClose={onPasswordClose} isCentered size="md">
                 <ModalOverlay />
                 <ModalContent id="modal-password-user">
