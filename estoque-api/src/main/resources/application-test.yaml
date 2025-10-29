@@ -1,14 +1,12 @@
 spring:
-  profiles:
-       active: test
   datasource:
-    url: jdbc:postgresql://localhost:5432/tcc
+    url: jdbc:postgresql://localhost:5432/tcc_tests
     username: postgres
     password: "admin"
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   jwt:

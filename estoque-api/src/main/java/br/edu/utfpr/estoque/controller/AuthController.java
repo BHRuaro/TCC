@@ -9,12 +9,16 @@ import br.edu.utfpr.estoque.security.dto.AuthRequest;
 import br.edu.utfpr.estoque.security.dto.AuthResponse;
 import br.edu.utfpr.estoque.shared.DtoMapper;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -36,30 +40,51 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
-        authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
+    public ResponseEntity<?> login(@RequestBody AuthRequest request) {
+        try {
+            authManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+            );
 
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+            User user = userRepository.findByUsername(request.getUsername())
+                    .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
 
-        if (!user.getActive()) {
-            throw new IllegalArgumentException("Usuário inativo. Contate o administrador.");
+            if (!user.getActive()) {
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(Map.of("message", "Usuário inativo. Contate o administrador."));
+            }
+
+            String token = jwtService.generateToken(user);
+            long expiresIn = jwtService.getJwtExpirationMs() / 1000;
+
+            AuthResponse response = new AuthResponse(
+                    token,
+                    expiresIn,
+                    user.getRole(),
+                    user.getName(),
+                    user.getId()
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (BadCredentialsException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Usuário inexistente ou senha inválida"));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Erro ao processar login. Tente novamente mais tarde."));
         }
-
-        String token = jwtService.generateToken(user);
-        long expiresIn = jwtService.getJwtExpirationMs() / 1000;
-
-        AuthResponse response = new AuthResponse(
-                token,
-                expiresIn,
-                user.getRole(),
-                user.getName(),
-                user.getId()
-        );
-
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")

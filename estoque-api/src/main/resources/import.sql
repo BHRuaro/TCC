@@ -1,0 +1,3 @@
+INSERT INTO app_user (id, "name", username, "password", "role", active) VALUES (1, 'Administrador', 'admin', '$2a$12$iaLZp0VYWwHWiWFxVCyYBesYDE1lYV05.2cmxKKLWH.WtaVL2Z5gS', 'ROLE_ADMIN', true);
+INSERT INTO app_user (id, active, "name", "password", "role", username) VALUES(2, true, 'Cypress', '$2a$10$C1k8hsKt4k8QJU6gevpv8.1qMQMhiJrCxgvUIZYi2WFFIzAmI3v/C', 'ROLE_ADMIN', 'cypress-admin');
+INSERT INTO app_user (id, active, "name", "password", "role", username) VALUES(3, true, 'Cypress', '$2a$10$n6XE5PxXh1B7cyRnnIzeJ.Fjg5e/l6es6xvyUo1WOxRHJn4APOOle', 'USER', 'cypress-user');

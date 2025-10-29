@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EnableJpaRepositories(value = {"br.edu.utfpr.estoque.repository", "br.edu.utfpr.estoque.spec"})
+@EnableJpaRepositories(value = {"br.edu.utfpr.estoque.repository"})
 @EntityScan("br.edu.utfpr.estoque.model")
 public class SistemaDeGerenciamentoDeEstoqueApplication {
 
