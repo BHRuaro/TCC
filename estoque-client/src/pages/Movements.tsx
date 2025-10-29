@@ -249,7 +249,19 @@ export default function Movements() {
             </Flex>
 
             <SearchBar
-                data={filteredMovements}
+                data={movements.map((m) => ({
+                    ...m,
+                    fornecedorNome: suppliers.find((s) => s.id === m.supplierId)?.name || "",
+                    pessoaNome: persons.find((p) => p.id === m.personId)?.name || "",
+                    usuarioNome: m.userId ? `${m.userId} - ${m.userName || ""}` : "-",
+                    itensTexto: m.itemMovements
+                        ?.map((im) => {
+                            const item = items.find((i) => i.id === im.itemId)
+                            return item ? `${item.name} (${im.quantity})` : ""
+                        })
+                        .filter(Boolean)
+                        .join(", "),
+                }))}
                 fields={[
                     { key: "id", label: "ID" },
                     { key: "type", label: "Tipo" },

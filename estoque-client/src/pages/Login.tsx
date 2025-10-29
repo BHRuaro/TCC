@@ -50,6 +50,7 @@ export default function Login() {
         } catch (err: any) {
             localStorage.clear()
             toast({
+                id: "error-message",
                 title: "Erro no login",
                 description: err.message || "Não foi possível autenticar",
                 status: "error",

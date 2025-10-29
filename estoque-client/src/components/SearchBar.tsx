@@ -24,17 +24,17 @@ export default function SearchBar<T extends object>({
     const [query, setQuery] = useState("")
 
     useEffect(() => {
-        handleSearch()
+        if (query.trim()) {
+            handleSearch()
+        } else {
+            onSearch(data)
+        }
     }, [query, selectedField])
 
     const handleSearch = async () => {
-        if (onReload) {
-            await onReload()
-            return
-        }
-
         if (!query.trim()) {
-            onSearch(data)
+            if (onReload) await onReload()
+            else onSearch(data)
             return
         }
 
@@ -51,6 +51,7 @@ export default function SearchBar<T extends object>({
     return (
         <Flex gap={3} mb={4} align="center">
             <Select
+                id="select-field"
                 w="220px"
                 value={selectedField}
                 onChange={(e) => setSelectedField(e.target.value)}

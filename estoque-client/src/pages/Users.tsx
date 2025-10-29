@@ -118,7 +118,7 @@ export default function Users() {
     const handleSave = async () => {
         if (!name.trim() || !username.trim()) {
             toast({
-                title: "Preencha os campos obrigatórios (Nome e Usuário)",
+                title: "Preencha os campos obrigatórios",
                 status: "warning",
             })
             return
@@ -245,7 +245,7 @@ export default function Users() {
             {loading ? (
                 <Spinner />
             ) : (
-                <Table variant="simple" mt={4}>
+                <Table variant="simple" mt={4} id="table-users">
                     <Thead>
                         <Tr>
                             <Th>ID</Th>
@@ -324,7 +324,6 @@ export default function Users() {
                 </Table>
             )}
 
-            {/* MODAL DE EDIÇÃO */}
             <Modal isOpen={isEditOpen} onClose={onEditClose} isCentered size="lg">
                 <ModalOverlay />
                 <ModalContent id="modal-edit-user">

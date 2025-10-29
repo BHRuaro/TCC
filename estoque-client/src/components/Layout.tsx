@@ -50,7 +50,7 @@ export default function Layout() {
 
                 <Flex align="center" gap={4}>
                     {user && (
-                        <Text fontWeight="medium" fontSize="lg">
+                        <Text fontWeight="medium" fontSize="lg" id="hello-user">
                             Olá, {user.name}
                         </Text>
                     )}
@@ -69,13 +69,13 @@ export default function Layout() {
                     borderColor="gray.200"
                 >
                     <VStack align="stretch" gap={4}>
-                        <NavItem to="/">Início</NavItem>
-                        <NavItem to="/movements">Movimentações</NavItem>
-                        <NavItem to="/items">Itens</NavItem>
-                        <NavItem to="/categories">Categorias</NavItem>
-                        <NavItem to="/persons">Pessoas</NavItem>
-                        <NavItem to="/suppliers">Fornecedores</NavItem>
-                        <NavItem to="/users">Usuários</NavItem>
+                        <NavItem to="/" id="nav-inicio">Início</NavItem>
+                        <NavItem to="/movements" id="nav-movimentacoes">Movimentações</NavItem>
+                        <NavItem to="/items" id="nav-itens">Itens</NavItem>
+                        <NavItem to="/categories" id="nav-categorias">Categorias</NavItem>
+                        <NavItem to="/persons" id="nav-pessoas">Pessoas</NavItem>
+                        <NavItem to="/suppliers" id="nav-fornecedores">Fornecedores</NavItem>
+                        <NavItem to="/users" id="nav-usuarios">Usuários</NavItem>
                     </VStack>
 
                     <Button
@@ -84,6 +84,7 @@ export default function Layout() {
                         variant="solid"
                         w="full"
                         onClick={handleLogout}
+                        id="button-logout"
                     >
                         Sair
                     </Button>
