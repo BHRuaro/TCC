@@ -82,7 +82,7 @@ public class StockMovementService extends CrudService<StockMovement, StockMoveme
                     throw new IllegalArgumentException("A quantidade deve ser maior que zero.");
 
                 if (type == MovementType.SAIDA) {
-                    if (item.getMovementLimit() != null && quantity > item.getMovementLimit())
+                    if (item.getMovementLimit() != null && item.getMovementLimit() > 0 && quantity > item.getMovementLimit())
                         throw new IllegalArgumentException("A quantidade (" + quantity + ") excede o limite de movimentação definido para o item: " + item.getName());
 
                     if (item.getExpirationDate() != null && item.getExpirationDate().isBefore(LocalDate.now()))
@@ -92,7 +92,7 @@ public class StockMovementService extends CrudService<StockMovement, StockMoveme
                         throw new IllegalArgumentException("Estoque insuficiente para o item: " + item.getName());
 
                     int newStock = item.getStockQuantity() - quantity;
-                    if (item.getMinStockQuantity() != null && newStock < item.getMinStockQuantity()) {
+                    if (item.getMinStockQuantity() != null && item.getMinStockQuantity() > 0 && newStock < item.getMinStockQuantity()) {
                         warnings.add("Atenção: o estoque do item '" + item.getName() + "' ficou abaixo do mínimo (" + item.getMinStockQuantity() + ").");
                     }
                 }
