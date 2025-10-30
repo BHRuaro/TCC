@@ -7,6 +7,8 @@ describe('Usuarios', () => {
         })
 
         it('Deve criar um novo usuário', () => {
+            cy.task('queryDatabase', 'SELECT setval(\'app_user_id_seq\', (SELECT MAX(id) FROM "app_user") + 1);')
+
             cy.login('cypress-admin', 'admin');
             cy.visit('/users');
             cy.get('#button-add-user').click();
@@ -20,6 +22,8 @@ describe('Usuarios', () => {
         });
 
         it('Deve editar um usuário existente', () => {
+            cy.task('queryDatabase', 'SELECT setval(\'app_user_id_seq\', (SELECT MAX(id) FROM "app_user") + 1);')
+
             var id
             cy.login('cypress-admin', 'admin').then(() => {
                 cy.request({
@@ -53,6 +57,8 @@ describe('Usuarios', () => {
         });
 
         it('Deve excluir um usuário existente', () => {
+            cy.task('queryDatabase', 'SELECT setval(\'app_user_id_seq\', (SELECT MAX(id) FROM "app_user") + 1);')
+
             var id
             cy.login('cypress-admin', 'admin').then(() => {
                 cy.request({
