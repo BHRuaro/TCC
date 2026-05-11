@@ -18,7 +18,7 @@ public class StockMovement implements Identifiable<Long> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "movement_id")
+    @Column(name = "id")
     private Long id;
 
     @ManyToOne

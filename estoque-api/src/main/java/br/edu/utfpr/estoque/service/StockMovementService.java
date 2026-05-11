@@ -54,6 +54,10 @@ public class StockMovementService extends CrudService<StockMovement, StockMoveme
         MovementType type = movement.getType();
         List<String> warnings = new ArrayList<>();
 
+        User user = userRepository.findById(movement.getUser().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
+        movement.setUser(user);
+
         if (type == MovementType.ENTRADA && movement.getSupplier() == null)
             throw new IllegalArgumentException("Fornecedor é obrigatório para ENTRADA.");
         if (type == MovementType.SAIDA && movement.getPerson() == null)
@@ -61,10 +65,6 @@ public class StockMovementService extends CrudService<StockMovement, StockMoveme
 
         if (movement.getUser() == null || movement.getUser().getId() == null)
             throw new IllegalArgumentException("O identificador do usuário é obrigatório.");
-
-        User user = userRepository.findById(movement.getUser().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-        movement.setUser(user);
 
         if (movement.getItemMovements() != null) {
             for (ItemMovement itemMovement : movement.getItemMovements()) {

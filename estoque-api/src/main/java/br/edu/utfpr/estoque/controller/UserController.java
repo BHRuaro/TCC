@@ -33,6 +33,7 @@ public class UserController extends CrudController<User, UserDTO, Long> {
 
     @Override
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<UserDTO> update(
             @PathVariable Long id,
             @RequestBody UserDTO dto
